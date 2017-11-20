@@ -41,6 +41,7 @@ PatternDBMerger.cxx
 PatternMatcher.cxx
 TestDataGenerator.cxx
 MomDataGenerator.cxx
+TSMomDataGenerator.cxx
 
 )
 
