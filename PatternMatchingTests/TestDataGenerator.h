@@ -1,5 +1,5 @@
 /*
- * TestClass.h
+ * TestDataGenerator.h
  *
  *  Created on: Nov 2, 2017
  *      Author: vagrant
@@ -22,11 +22,10 @@
 #include <fstream>
 
 
-class TestClass: public FairTask {
+class TestDataGenerator: public FairTask {
 public:
-  TestClass();
-  virtual ~TestClass();
-  void SetSuffix(TString suff);
+  TestDataGenerator();
+  virtual ~TestDataGenerator();
 
 protected:
   virtual void SetParContainers();
@@ -42,7 +41,7 @@ private:
   TClonesArray *fFTSHitArray;
   TClonesArray *fMCTrackArray;
   
-  //  output
+  // output
   TFile *outputFile;
   TTree *tTrackPatterns;
   TString outputFileName;
@@ -50,13 +49,10 @@ private:
   // csv file
   std::ofstream csvFile;
 
-  //  tree members
+  // tree members
   Pattern *bPattern;
   
-  // Suffix
-  TString suffix;
-  
-  ClassDef(TestClass,1)
+  ClassDef(TestDataGenerator,1)
 
 };
 

@@ -1,4 +1,4 @@
-int generateData(Int_t iJob = 0, TString inputFolder = "../../data_new/") {
+int generateMomData(Int_t iJob = 0, TString inputFolder = "../../data_new/") {
 
   Int_t nEvents = 0;
   
@@ -40,7 +40,7 @@ int generateData(Int_t iJob = 0, TString inputFolder = "../../data_new/") {
   rtdb->setSecondInput(parIo1);
 
   // starts the pattern counter, no specific options at the moment
-  TestClass *test = new TestClass();
+  MomDataGenerator *test = new MomDataGenerator();
   test->SetSuffix(suffix);
   fRun->AddTask(test);
   

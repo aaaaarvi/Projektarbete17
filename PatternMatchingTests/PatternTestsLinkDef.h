@@ -11,6 +11,7 @@
 #pragma link C++ class PatternDBGenerator+;
 #pragma link C++ class PatternDBMerger+;
 #pragma link C++ class PatternMatcher+;
-#pragma link C++ class TestClass+;
+#pragma link C++ class TestDataGenerator+;
+#pragma link C++ class MomDataGenerator+;
 #endif
 

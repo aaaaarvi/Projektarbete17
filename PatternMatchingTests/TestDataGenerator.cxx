@@ -1,11 +1,11 @@
 /*
- * TestClass.cxx
+ * TestDataGenerator.cxx
  *
  *  Created on: Nov 2, 2017
  *      Author: vagrant
  */
 
-#include "TestClass.h"
+#include "TestDataGenerator.h"
 
 #include <FairMultiLinkedData.h>
 #include <FairRunAna.h>
@@ -27,25 +27,25 @@
 #include <fstream>
 
 
-ClassImp(TestClass)
+ClassImp(TestDataGenerator)
 
-TestClass::TestClass() {
+TestDataGenerator::TestDataGenerator() {
   fSttParameters = NULL;
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
   fMCTrackArray = NULL;
 }
 
-TestClass::~TestClass() {
+TestDataGenerator::~TestDataGenerator() {
   // TODO Auto-generated destructor stub
 }
 
-void TestClass::SetParContainers() {
+void TestDataGenerator::SetParContainers() {
   FairRuntimeDb *rtdb = FairRunAna::Instance()->GetRuntimeDb();
   fSttParameters = (PndGeoSttPar*) rtdb->getContainer("PndGeoSttPar");
 }
 
-InitStatus TestClass::Init() {
+InitStatus TestDataGenerator::Init() {
   
   // Create file
   csvFile.open("data.csv");
@@ -70,7 +70,7 @@ InitStatus TestClass::Init() {
 }
 
 
-void TestClass::Exec(Option_t* opt) {
+void TestDataGenerator::Exec(Option_t* opt) {
   PndMCTrack *mcTrack;
   PndSttHit *sttHit;
   PndFtsHit *ftsHit;
@@ -117,7 +117,7 @@ void TestClass::Exec(Option_t* opt) {
 }
 
 
-void TestClass::FinishTask() {
+void TestDataGenerator::FinishTask() {
   // close csv
   csvFile.close();
 }

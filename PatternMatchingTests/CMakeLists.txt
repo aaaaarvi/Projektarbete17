@@ -39,7 +39,8 @@ PatternCounter.cxx
 PatternDBGenerator.cxx
 PatternDBMerger.cxx
 PatternMatcher.cxx
-TestClass.cxx
+TestDataGenerator.cxx
+MomDataGenerator.cxx
 
 )
 

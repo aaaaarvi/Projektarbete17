@@ -1,11 +1,11 @@
 /*
- * TestClass.cxx
+ * MomDataGenerator.cxx
  *
  *  Created on: Nov 2, 2017
  *      Author: vagrant
  */
 
-#include "TestClass.h"
+#include "MomDataGenerator.h"
 
 #include <FairMultiLinkedData.h>
 #include <FairRunAna.h>
@@ -27,9 +27,9 @@
 #include <fstream>
 
 
-ClassImp(TestClass)
+ClassImp(MomDataGenerator)
 
-TestClass::TestClass() {
+MomDataGenerator::MomDataGenerator() {
   fSttParameters = NULL;
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
@@ -37,16 +37,16 @@ TestClass::TestClass() {
   suffix = "";
 }
 
-TestClass::~TestClass() {
+MomDataGenerator::~MomDataGenerator() {
   // TODO Auto-generated destructor stub
 }
 
-void TestClass::SetParContainers() {
+void MomDataGenerator::SetParContainers() {
   FairRuntimeDb *rtdb = FairRunAna::Instance()->GetRuntimeDb();
   fSttParameters = (PndGeoSttPar*) rtdb->getContainer("PndGeoSttPar");
 }
 
-InitStatus TestClass::Init() {
+InitStatus MomDataGenerator::Init() {
   
   // Create file
   TString dataFileName = "data/data" + suffix + ".csv";
@@ -72,7 +72,7 @@ InitStatus TestClass::Init() {
 }
 
 
-void TestClass::Exec(Option_t* opt) {
+void MomDataGenerator::Exec(Option_t* opt) {
   PndMCTrack *mcTrack;
   PndSttHit *sttHit;
   PndFtsHit *ftsHit;
@@ -130,13 +130,13 @@ void TestClass::Exec(Option_t* opt) {
 }
 
 
-void TestClass::FinishTask() {
+void MomDataGenerator::FinishTask() {
   // close csv
   csvFile.close();
 }
 
 
-void TestClass::SetSuffix(TString suff) {
+void MomDataGenerator::SetSuffix(TString suff) {
   suffix = suff;
 }
 

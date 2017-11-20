@@ -40,7 +40,7 @@ int generateTestData(Int_t iJob = 0, TString inputFolder = "./") {
   rtdb->setSecondInput(parIo1);
 
   // starts the pattern counter, no specific options at the moment
-  TestClass *test = new TestClass();
+  TestDataGenerator *test = new TestDataGenerator();
   //test->SetSuffix(suffix);
   fRun->AddTask(test);
   
