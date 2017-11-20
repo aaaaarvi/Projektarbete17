@@ -26,7 +26,6 @@ class TestClass: public FairTask {
 public:
   TestClass();
   virtual ~TestClass();
-  void SetSuffix(TString suff);
 
 protected:
   virtual void SetParContainers();
@@ -42,7 +41,7 @@ private:
   TClonesArray *fFTSHitArray;
   TClonesArray *fMCTrackArray;
   
-  //  output
+  // output
   TFile *outputFile;
   TTree *tTrackPatterns;
   TString outputFileName;
@@ -50,11 +49,8 @@ private:
   // csv file
   std::ofstream csvFile;
 
-  //  tree members
+  // tree members
   Pattern *bPattern;
-  
-  // Suffix
-  TString suffix;
   
   ClassDef(TestClass,1)
 

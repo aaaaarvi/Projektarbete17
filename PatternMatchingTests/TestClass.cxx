@@ -13,9 +13,9 @@
 #include <PndSttMapCreator.h>
 #include <PndSttTube.h>
 #include <PndSttHit.h>
-#include <PndFtsHit.h>
 #include <PndTrackCand.h>
 #include <PndTrack.h>
+#include <PndFtsHit.h>
 #include <boost/range/adaptor/reversed.hpp>
 #include <TArc.h>
 #include <TArrow.h>
@@ -34,7 +34,6 @@ TestClass::TestClass() {
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
   fMCTrackArray = NULL;
-  suffix = "";
 }
 
 TestClass::~TestClass() {
@@ -49,8 +48,7 @@ void TestClass::SetParContainers() {
 InitStatus TestClass::Init() {
   
   // Create file
-  TString dataFileName = "data/data" + suffix + ".csv";
-  csvFile.open(dataFileName);
+  csvFile.open("data.csv");
   
   // Get the running instance of the FairRootManager to access tree branches
   FairRootManager *ioman = FairRootManager::Instance();
@@ -82,22 +80,13 @@ void TestClass::Exec(Option_t* opt) {
   // Get FairRootManager instance to access objects through FairLinks
   FairRootManager *ioman = FairRootManager::Instance();
   
-  // Get the number of MC tracks and tube hits
+  // Get the number of MC tracks and tube hits and write to file
   int nTracks = fMCTrackArray->GetEntriesFast();
   int nTubesSTT = fSTTHitArray->GetEntriesFast();
   int nTubesFTS = fFTSHitArray->GetEntriesFast();
-  
-  // Count the number of particles and write to file
-  int nParticles = 0;
-  for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-    mcTrack = (PndMCTrack*) (fMCTrackArray->At(iTrack));
-    mID = mcTrack->GetMotherID();
-    pdg = mcTrack->GetPdgCode();
-    if (mID == -1 && (pdg == 2212 || pdg == -2212 || pdg == 211 || pdg == -211)) {
-      nParticles++;
-    }
-  }
-  csvFile << nParticles;
+  csvFile << "Total number of tracks:   " << nTracks << "\n";
+  csvFile << "Total number of STT hits: " << nTubesSTT << "\n";
+  csvFile << "Total number of FTS hits: " << nTubesFTS << "\n";
   
   // Print the momenta of the particles
   for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
@@ -106,25 +95,23 @@ void TestClass::Exec(Option_t* opt) {
     pdg = mcTrack->GetPdgCode();
     if (mID == -1 && (pdg == 2212 || pdg == -2212 || pdg == 211 || pdg == -211)) {
       momentum = mcTrack->GetMomentum();
-      csvFile << "," << pdg << "," << momentum.Px() << "," << momentum.Py();
+      csvFile << pdg << ": \t" << momentum.Px() << ", " << momentum.Py() << "\n";
     }
   }
-  
-  // Print the number of tube hits
-  csvFile << "," << nTubesSTT;
-  csvFile << "," << nTubesFTS;
   
   // Print the STT tube IDs
   for (int iTube = 0; iTube < nTubesSTT; ++iTube) {
     sttHit = (PndSttHit*) (fSTTHitArray->At(iTube));
-    csvFile << "," << sttHit->GetTubeID();
+    csvFile << sttHit->GetTubeID() << ", ";
   }
+  csvFile << "\n";
   
   // Print the FTS tube IDs
   for (int iTube = 0; iTube < nTubesFTS; ++iTube) {
     ftsHit = (PndFtsHit*) (fFTSHitArray->At(iTube));
-    csvFile << "," << ftsHit->GetTubeID();
+    csvFile << ftsHit->GetTubeID() << ", ";
   }
+  csvFile << "\n";
   
   csvFile << "\n";
 }
@@ -136,9 +123,7 @@ void TestClass::FinishTask() {
 }
 
 
-void TestClass::SetSuffix(TString suff) {
-  suffix = suff;
-}
+
 
 
 
