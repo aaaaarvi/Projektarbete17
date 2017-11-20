@@ -102,7 +102,7 @@ void TestDataGenerator::Exec(Option_t* opt) {
   // Print the STT tube IDs
   for (int iTube = 0; iTube < nTubesSTT; ++iTube) {
     sttHit = (PndSttHit*) (fSTTHitArray->At(iTube));
-    csvFile << sttHit->GetTubeID() << ", " << sttHit->GetTimeStamp() << ", ";
+    csvFile << sttHit->GetTubeID() << ", " << sttHit->GetTimeStamp();
   }
   csvFile << "\n";
   

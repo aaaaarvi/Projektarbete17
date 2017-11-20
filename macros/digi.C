@@ -47,7 +47,7 @@ int digi(Int_t iJob = 0, TString folder = "./")
   rtdb->setSecondInput(parIo1);
   
   // -----   STT digi producers   ---------------------------------
-  PndSttHitProducerRealFast* sttHitProducer = new PndSttHitProducerRealFast();
+  PndSttHitProducerRealFull* sttHitProducer = new PndSttHitProducerRealFull();
   fRun->AddTask(sttHitProducer);
   
   // -----   MDV digi producers   ---------------------------------
@@ -103,7 +103,7 @@ int digi(Int_t iJob = 0, TString folder = "./")
   fRun->AddTask(gemFindHits);
 
   // -----   FTS hit producers   ---------------------------------
-  PndFtsHitProducerRealFast* ftsHitProducer = new PndFtsHitProducerRealFast();
+  PndFtsHitProducerRealFull* ftsHitProducer = new PndFtsHitProducerRealFull();
   fRun->AddTask(ftsHitProducer);
 
   // -----   Ftof hit producers   ---------------------------
