@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-nJobs=300
+nJobs=73
 nEventsPerJob=1000
 
 JOBFILE="job.sh"
 OUTPUTDIR="../../data_new/"
 
-iJob=201
+iJob=1
 while [ $iJob -le $nJobs ]; do
   JOBFILE="job$iJob.sh"
   

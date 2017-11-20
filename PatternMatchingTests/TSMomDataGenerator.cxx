@@ -49,7 +49,7 @@ void TSMomDataGenerator::SetParContainers() {
 InitStatus TSMomDataGenerator::Init() {
   
   // Create file
-  TString dataFileName = "data/data" + suffix + ".csv";
+  TString dataFileName = "../../data_new/data" + suffix + ".csv";
   csvFile.open(dataFileName);
   
   // Get the running instance of the FairRootManager to access tree branches
