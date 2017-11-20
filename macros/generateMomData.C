@@ -1,4 +1,4 @@
-int generateMomData(Int_t iJob = 0, TString inputFolder = "../../data_new/") {
+int generateMomData(Int_t iJob = 0, TString inputFolder = "./") {
 
   Int_t nEvents = 0;
   

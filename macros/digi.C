@@ -1,4 +1,4 @@
-int digi(Int_t iJob = 0, TString folder = "../../data_new/")
+int digi(Int_t iJob = 0, TString folder = "./")
 {
   // Macro created 20/09/2006 by S.Spataro
   // It loads a simulation file and digitize hits 

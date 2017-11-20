@@ -3,7 +3,7 @@ clear;
 %% INITIALIZATION
 
 % Load data
-load('../../mat/data.mat');
+load('../../mat/dataTS.mat');
 
 % Number of training and testing points (images)
 Ntrain = 1000000;

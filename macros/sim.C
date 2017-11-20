@@ -5,7 +5,7 @@
 // to run with different options:(e.g more events, different momentum, Geant4)
 // root  sim_complete.C"(100, "TGeant4",2)"
 
-void sim(Int_t nEvents = 10, Int_t iJob = 0, TString folder = "../../data_new/", TString  SimEngine ="TGeant3", Float_t mom = 7.0)
+void sim(Int_t nEvents = 10, Int_t iJob = 0, TString folder = "./", TString  SimEngine ="TGeant3", Float_t mom = 7.0)
 {
   //-----User Settings:-----------------------------------------------
  
