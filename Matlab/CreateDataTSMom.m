@@ -3,7 +3,7 @@ clear;
 % Data properties
 NtubesSTT = 4542;
 NtubesFTS = 12224; % 13056
-Nfiles = 73;
+Nfiles = 19;
 Nevents = 1000;
 
 % Choose number of PCA components
@@ -85,13 +85,13 @@ Tfts(1,:) = [];
 
 % Perform PCA
 disp('Starting PCA...');
-load('../../mat/data.mat', 'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
+load('../../mat/dataTS.mat', 'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
 %coeffSTT = pca(full(Tstt(1:50000,:)));%, 'NumComponents', NcompSTT);
 %coeffFTS = pca(full(Tfts(1:50000,:)));%, 'NumComponents', NcompFTS);
 
 % Save the data
 Npoints = Nfiles*Nevents;
-save('../../mat/data.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
+save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
     'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
 
 

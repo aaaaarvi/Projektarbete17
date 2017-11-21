@@ -6,7 +6,7 @@ nEventsPerJob=1000
 JOBFILE="job.sh"
 OUTPUTDIR="../../data_new/"
 
-iJob=1
+iJob=20
 while [ $iJob -le $nJobs ]; do
   JOBFILE="job$iJob.sh"
   
@@ -14,7 +14,7 @@ while [ $iJob -le $nJobs ]; do
   echo "OUTPUTDIR=$OUTPUTDIR" >> $JOBFILE
   echo "nEvents=$nEventsPerJob" >> $JOBFILE
   echo "iJob=$iJob" >> $JOBFILE
-  #echo 'root -q -b sim.C"($nEvents,$iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  echo 'root -q -b sim.C"($nEvents,$iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   echo 'root -q -b digi.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   echo 'root -q -b recoideal.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   echo 'root -q -b generateTSMomData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE

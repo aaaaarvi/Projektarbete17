@@ -10,8 +10,8 @@ Ntrain = 1000000;
 Ntest = 2000;
 
 % Choose number of PCA components
-NcompSTT = 1000;
-NcompFTS = 2000;
+NcompSTT = NtubesSTT;%1000;
+NcompFTS = NtubesFTS;%2000;
 
 % Load and save flags
 load_flag = 0;
@@ -39,7 +39,7 @@ s1_1 = 200;      % 1:st hidden layer (STT data)
 s1_2 = 200;      % 1:st hidden layer (FTS data)
 s2_1 = 100;      % 2:nd hidden layer (STT data)
 s2_2 = 100;      % 2:nd hidden layer (FTS data)
-s3 = 100;         % 3:rd hidden layer
+s3 = 100;        % 3:rd hidden layer
 s4 = 60;         % 4:th hidden layer
 s5 = 30;         % 5:th hidden layer
 m = 8;           % Number of output neurons
@@ -70,8 +70,8 @@ lossg = @quadraticLoss_grad;
 st_dev = 0.055;
 
 % Transform data
-Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
-Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
+%Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
+%Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
 T = [Tstt, Tfts];
 
 % Divide into training and testing indices
