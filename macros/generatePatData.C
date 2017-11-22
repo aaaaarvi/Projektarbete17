@@ -5,7 +5,7 @@ int generatePatData(Int_t iJob = 0, TString inputFolder = "./") {
   // TString inputFolder = "";
   
   TString suffix = "";
-  //suffix.Form("_%i",iJob);
+  suffix.Form("_%i",iJob);
 
   // Set input and output files
   TString simFile = inputFolder+"/"+"sim" + suffix + ".root";
@@ -41,7 +41,7 @@ int generatePatData(Int_t iJob = 0, TString inputFolder = "./") {
 
   // starts the pattern counter, no specific options at the moment
   PatDataGenerator *test = new PatDataGenerator();
-  test->SetFileName("../../data_new/dataPat" + suffix + ".csv");
+  test->SetFileName("../../data_new/data" + suffix + ".csv");
   fRun->AddTask(test);
   
 

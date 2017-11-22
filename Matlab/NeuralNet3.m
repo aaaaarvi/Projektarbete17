@@ -155,12 +155,12 @@ for ep = 1:Nep
         C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
         
         % Compute the training prediction accuracy
-        predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y)/n)/epochSize;
+        predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y)/m)/epochSize;
         
         % Compute the training Jaccard index
-        M11 = sum(round(Yh) == 1 && Yh == 1);
-        M01 = sum(round(Yh) == 0 && Yh == 1);
-        M10 = sum(round(Yh) == 1 && Yh == 0);
+        M11 = sum((round(Yh) == 1) & (Yh == 1));
+        M01 = sum((round(Yh) == 0) & (Yh == 1));
+        M10 = sum((round(Yh) == 1) & (Yh == 0));
         jaccard_train(ep) = jaccard_train(ep) + M11/(M11 + M01 + M10)/epochSize;
         
         % Backpropagate
@@ -256,11 +256,11 @@ for ep = 1:Nep
         Yh = sigmay(Yp);
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
-        predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y)/n)/epochSize;
-        M11 = sum(round(Yh) == 1 && Yh == 1);
-        M01 = sum(round(Yh) == 0 && Yh == 1);
-        M10 = sum(round(Yh) == 1 && Yh == 0);
-        jaccard_test(ep) = jaccard_test(ep) + M11/(M11 + M01 + M10)/epochSize;
+        predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y)/m)/Ntest;
+        M11 = sum((round(Yh) == 1) & (Yh == 1));
+        M01 = sum((round(Yh) == 0) & (Yh == 1));
+        M10 = sum((round(Yh) == 1) & (Yh == 0));
+        jaccard_test(ep) = jaccard_test(ep) + M11/(M11 + M01 + M10)/Ntest;
     end
     
     % Update predAccMax and save the weights

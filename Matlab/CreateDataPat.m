@@ -2,12 +2,12 @@ clear;
 
 % Data properties
 NtubesSTT = 4542;
-Nfiles = 19;
+Nfiles = 43;
 Nevents = 1000;
 
 % Import data
-Tstt = sparse(Nfiles*Nevents, NtubesSTT);
-A = sparse(Nfiles*Nevents, NtubesSTT);
+Tstt = sparse(zeros(1, NtubesSTT));
+A = sparse(zeros(1, NtubesSTT));
 disp('Importing data...');
 for i = 1:Nfiles
     csv = csvread(['../../dataPat/data_' num2str(i) '.csv']);
@@ -54,6 +54,8 @@ for i = 1:Nfiles
     temp2 = [[temp; zeros(1000 - tempSize(1), tempSize(2))], zeros(1000, NtubesSTT - tempSize(2))];
     A = [A; temp2];
 end
+Tstt(1,:) = [];
+A(1,:) = [];
 
 % Save the data
 disp('Saving data...');
