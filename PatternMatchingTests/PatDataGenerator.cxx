@@ -64,28 +64,16 @@ InitStatus PatDataGenerator::Init() {
     return kFATAL;
   }
   
-  // Event header info
-  fEventHeader = (TClonesArray*) ioman->GetObject("EventHeader.");
-  if (!fEventHeader) {
-    std::cout << "-E- PatternDBGenerator:Init: EventHeader not instantiated!" << std::endl;
-  }
   
   // Access the STTHit branch
   fSTTHitArray = (TClonesArray*) ioman->GetObject("STTHit");
-  //And the FTSHits branch
-  fFTSHitArray = (TClonesArray*) ioman->GetObject("FTSHit");
   // Initialize the STT map and get an array of all tubes
-  PndSttMapCreator *mapper = new PndSttMapCreator(fSttParameters);
-  fTubeArray = mapper->FillTubeArray();
-  
+
   // Get the ID of the STTHit branch for accessing the FairLinks later
   sttBranchID = ioman->GetBranchId("STTHit");
   if (sttBranchID == -1) {
     std::cout << "-E- PatternDBGenerator:Init: STTHit branch not found!" << std::endl;
   }
-  
-  // Access the MCTrack branch
-  fMCTrackArray = (TClonesArray*) ioman->GetObject("MCTrack");
   
   // Get the ID of the MCTrack branch for accessing through FairLinks later
   mcTrackID = ioman->GetBranchId("MCTrack");
@@ -97,20 +85,7 @@ InitStatus PatDataGenerator::Init() {
   trackCands = (TClonesArray*) ioman->GetObject("SttMvdGemIdealTrackCand");
   if (!trackCands) {
     std::cout << "-E- PatternDBGenerator:Init: SttMvdGemIdealTrackCand not fount!" << std::endl;
-  }
-  
-  // Get the ideal tracks from the ideal track finder
-  idealTracks = (TClonesArray*) ioman->GetObject("SttMvdGemIdealTrack");
-  if (!idealTracks) {
-    std::cout << "-E- PatternDBGenerator:Init: SttMvdGemIdealTrack not found!" << std::endl;
-  }
-  
-  // Get the gen tracks from the ideal track finder
-  genTracks = (TClonesArray*) ioman->GetObject("SttMvdGemGenTrack");
-  if (!genTracks) {
-    std::cout << "-E- PatternDBGenerator:Init: SttMvdGemGenTrack not found!" << std::endl;
-  }
-  
+  }  
   // Initialization successful
   std::cout << "-I- PatternDBGenerator: Initialisation successful" << std::endl;
   return kSUCCESS;
@@ -130,12 +105,10 @@ void PatDataGenerator::Exec(Option_t* opt) {
   //csvFile << nTrackCands << "\n";
   
   int nTubesSTT = fSTTHitArray->GetEntriesFast();
-  int nTubesFTS = fFTSHitArray->GetEntriesFast();
-  int nTracks = fMCTrackArray->GetEntriesFast();
   // Write the momenta of the particles
   PndTrackCand *cand;
   FairMultiLinkedData sttLinks;
-    // Print the number of tube hits
+  // Print the number of tube hits
   csvFile << nTubesSTT;
   
   int nTubes = 0;
@@ -147,11 +120,11 @@ void PatDataGenerator::Exec(Option_t* opt) {
     mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
 
     if (mcTrack->GetPdgCode()==2212 && mcTrack->GetMotherID() == -1){
-    sttLinks = cand->GetLinksWithType(sttBranchID);
-    nTubes += sttLinks.GetNLinks();
+       sttLinks = cand->GetLinksWithType(sttBranchID);
+       nTubes += sttLinks.GetNLinks();
+   }
   }
-  }
-  csvFile << ", " << nTubes;
+  csvFile << "," << nTubes;
   
   // Print the STT tube IDs
   for (int iTube = 0; iTube < nTubesSTT; ++iTube) {

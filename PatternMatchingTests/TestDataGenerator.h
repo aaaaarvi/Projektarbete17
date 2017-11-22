@@ -10,6 +10,7 @@
 
 #include <FairTask.h>
 #include <PndGeoSttPar.h>
+#include <PndGeoFtsPar.h>
 #include <PndMCTrack.h>
 #include <PndSttHit.h>
 #include <TCanvas.h>
@@ -37,6 +38,7 @@ private:
   
   // input
   PndGeoSttPar *fSttParameters;
+  PndGeoFtsPar *fFtsParameters;
   TClonesArray *fSTTHitArray;
   TClonesArray *fFTSHitArray;
   TClonesArray *fMCTrackArray;

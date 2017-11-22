@@ -12,6 +12,7 @@ Set(SYSTEM_INCLUDE_DIRECTORIES
 Set(INCLUDE_DIRECTORIES
   ${CMAKE_SOURCE_DIR}/PndTrackers/PatternMatchingTests
   ${CMAKE_SOURCE_DIR}/stt
+  ${CMAKE_SOURCE_DIR}/fts
   ${CMAKE_SOURCE_DIR}/pnddata
   ${CMAKE_SOURCE_DIR}/pnddata/SttData
   ${CMAKE_SOURCE_DIR}/pnddata/FtsData
