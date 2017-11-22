@@ -42,6 +42,7 @@ PatternMatcher.cxx
 TestDataGenerator.cxx
 MomDataGenerator.cxx
 TSMomDataGenerator.cxx
+PatDataGenerator.cxx
 
 )
 

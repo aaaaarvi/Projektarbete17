@@ -41,6 +41,7 @@ private:
   TClonesArray *fEventHeader;
   TClonesArray *fTubeArray;
   TClonesArray *fSTTHitArray;
+  TClonesArray *fFTSHitArray;  
   TClonesArray *fMCTrackArray;
   TClonesArray *trackCands;
   TClonesArray *idealTracks;

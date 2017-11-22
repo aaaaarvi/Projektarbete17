@@ -13,6 +13,8 @@
 #include <PndSttMapCreator.h>
 #include <PndSttTube.h>
 #include <PndTrackCand.h>
+#include <PndFtsHit.h>
+#include <PndSttHit.h>
 #include <boost/range/adaptor/reversed.hpp>
 #include <TArc.h>
 #include <TArrow.h>
@@ -31,6 +33,7 @@ PatDataGenerator::PatDataGenerator() {
   fEventHeader = NULL;
   fTubeArray = NULL;
   fSTTHitArray = NULL;
+  fFTSHitArray = NULL;
   fMCTrackArray = NULL;
   trackCands = NULL;
   idealTracks = NULL;
@@ -69,7 +72,8 @@ InitStatus PatDataGenerator::Init() {
   
   // Access the STTHit branch
   fSTTHitArray = (TClonesArray*) ioman->GetObject("STTHit");
-  
+  //And the FTSHits branch
+  fFTSHitArray = (TClonesArray*) ioman->GetObject("FTSHit");
   // Initialize the STT map and get an array of all tubes
   PndSttMapCreator *mapper = new PndSttMapCreator(fSttParameters);
   fTubeArray = mapper->FillTubeArray();
@@ -114,71 +118,72 @@ InitStatus PatDataGenerator::Init() {
 
 
 void PatDataGenerator::Exec(Option_t* opt) {
-  
+  PndMCTrack *mcTrack;
+  PndSttHit *sttHit;
+  PndFtsHit *ftsHit;
   // Get FairRootManager instance to access objects through FairLinks
   FairRootManager *ioman = FairRootManager::Instance();
   
   // Get the number of track candidates
   int nTrackCands = trackCands->GetEntriesFast();
   
-  csvFile << nTrackCands << "\n";
+  //csvFile << nTrackCands << "\n";
   
+  int nTubesSTT = fSTTHitArray->GetEntriesFast();
+  int nTubesFTS = fFTSHitArray->GetEntriesFast();
+  int nTracks = fMCTrackArray->GetEntriesFast();
   // Write the momenta of the particles
   PndTrackCand *cand;
   FairMultiLinkedData sttLinks;
-  for (int iTrackCand = 0; iTrackCand < nTrackCands; ++iTrackCand) {
-    
-    // Get the next track candidate
-    cand = (PndTrackCand*) (trackCands->At(iTrackCand));
-    
-    // Get link to corresponding MC track
-    FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
-    
-    // Check if only one MC track was found
-    if (mcTrackLinks.GetNLinks() == 0) {
-      std::cout << "WARNING: PatternDBGenerator:GenerateTrackPatterns: No MCTrack found, skipping event!" << std::endl;
-      continue;
-    }
-    if (mcTrackLinks.GetNLinks() > 1) {
-      std::cout << "WARNING: PatternDBGenerator:GenerateTrackPatterns: Found more than one MCTrack link!!!" << std::endl;
-    }
-    
-    // Get only first link since only one should be associated with track candidate
-    FairLink mcTrackLink = mcTrackLinks.GetLink(0);
-    PndMCTrack *mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
-    
-    // Write the momentum into the csv file
-    TVector3 momentum = mcTrack->GetMomentum();
-    csvFile << momentum.Px() << ", " << momentum.Py() << ", " << mcTrack->GetPdgCode();
-    csvFile << "\n";
-  }
-  csvFile << "\n";
+    // Print the number of tube hits
+  csvFile << nTubesSTT;
   
-  // Compute the total number of tubes
   int nTubes = 0;
-  for (int iTrackCand = 0; iTrackCand < nTrackCands; ++iTrackCand) {
-    cand = (PndTrackCand*) (trackCands->At(iTrackCand));
+  
+  for (int iTrack = 0; iTrack < nTrackCands; ++iTrack) {
+    cand = (PndTrackCand*) (trackCands->At(iTrack));
+    FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
+    FairLink mcTrackLink = mcTrackLinks.GetLink(0);
+    mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
+
+    if (mcTrack->GetPdgCode()==2212 && mcTrack->GetMotherID() == -1){
     sttLinks = cand->GetLinksWithType(sttBranchID);
     nTubes += sttLinks.GetNLinks();
   }
-  //csvFile << ", " << nTubes;
+  }
+  csvFile << ", " << nTubes;
+  
+  // Print the STT tube IDs
+  for (int iTube = 0; iTube < nTubesSTT; ++iTube) {
+    sttHit = (PndSttHit*) (fSTTHitArray->At(iTube));
+    csvFile << "," << sttHit->GetTubeID();
+  }
+  
   
   // Loop over all track candidates and write the tube IDs into the file
-  for (int iTrackCand = 0; iTrackCand < nTrackCands; ++iTrackCand) {
+  for (int iTrack = 0; iTrack < nTrackCands; ++iTrack) {
     
     // Get the next track candidate
-    cand = (PndTrackCand*) (trackCands->At(iTrackCand));
+    cand = (PndTrackCand*) (trackCands->At(iTrack));
+    
+    FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
+    FairLink mcTrackLink = mcTrackLinks.GetLink(0);
+    mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
     
     // Get the FairLinks from the candidate pointing at STTHit branch
     sttLinks = cand->GetLinksWithType(sttBranchID);
     
     // Write the tube IDs to the csv file
+    //csvFile << ", p";
+    if (mcTrack->GetPdgCode()==2212 && mcTrack->GetMotherID() == -1){
     for (int iLink = 0; iLink < sttLinks.GetNLinks(); ++iLink) {
+      
       FairLink sttLink = sttLinks.GetLink(iLink);
-      PndSttHit *sttHit = (PndSttHit*) (ioman->GetCloneOfLinkData(sttLink));
-      //csvFile << ", " << sttHit->GetTubeID();
+      sttHit = (PndSttHit*) (ioman->GetCloneOfLinkData(sttLink));
+      
+      csvFile << ", p" << sttHit->GetTubeID();
     }
-    
+   }
   }
   
   csvFile << "\n";
@@ -191,7 +196,7 @@ void PatDataGenerator::FinishTask() {
 }
 
 
-void TSMomDataGenerator::SetFileName(TString name) {
+void PatDataGenerator::SetFileName(TString name) {
   dataFileName = name;
 }
 
