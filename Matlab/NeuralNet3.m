@@ -158,10 +158,10 @@ for ep = 1:Nep
         predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y)/m)/epochSize;
         
         % Compute the training Jaccard index
-        M11 = sum((round(Yh) == 1) & (Yh == 1));
-        M01 = sum((round(Yh) == 0) & (Yh == 1));
-        M10 = sum((round(Yh) == 1) & (Yh == 0));
-        jaccard_train(ep) = jaccard_train(ep) + M11/(M11 + M01 + M10)/epochSize;
+        jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
+        if ~isnan(jaccard)
+            jaccard_train(ep) = jaccard_train(ep) + jaccard/epochSize;
+        end
         
         % Backpropagate
         delta_y = sigmayg(Yp)*lossg(Yh, Y);
@@ -257,10 +257,10 @@ for ep = 1:Nep
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
         predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y)/m)/Ntest;
-        M11 = sum((round(Yh) == 1) & (Yh == 1));
-        M01 = sum((round(Yh) == 0) & (Yh == 1));
-        M10 = sum((round(Yh) == 1) & (Yh == 0));
-        jaccard_test(ep) = jaccard_test(ep) + M11/(M11 + M01 + M10)/Ntest;
+        jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
+        if ~isnan(jaccard)
+            jaccard_test(ep) = jaccard_test(ep) + jaccard/Ntest;
+        end
     end
     
     % Update predAccMax and save the weights
@@ -328,21 +328,6 @@ close(h);
 
 
 %% TESTING
-
-% Test for an image
-testim = randsample(idx_train, 1);
-X = T(testim, :)';
-Z1tilde = (W1*X + B1)*pkeep;
-Z1 = sigma1(Z1tilde)*pkeep;
-Z2tilde = (W2*Z1 + B2)*pkeep;
-Z2 = sigma2(Z2tilde)*pkeep;
-Z3tilde = (W3*Z2 + B3)*pkeep;
-Z3 = sigma3(Z3tilde)*pkeep;
-Z4tilde = (W4*Z3 + B4)*pkeep;
-Z4 = sigma4(Z4tilde)*pkeep;
-Yp = Wy*Z4 + By;
-Yh = sigmay(Yp)
-Y = A(k, :)'
 
 % Plot the error and prediction accuracy
 figure;
