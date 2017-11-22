@@ -37,6 +37,7 @@ PatDataGenerator::PatDataGenerator() {
   genTracks = NULL;
   sttBranchID = -1;
   mcTrackID = -1;
+  dataFileName = "./dataPAT.csv";
 }
 
 PatDataGenerator::~PatDataGenerator() {
@@ -51,7 +52,7 @@ void PatDataGenerator::SetParContainers() {
 InitStatus PatDataGenerator::Init() {
   
   // Create file
-  csvFile.open("data.csv");
+  csvFile.open(dataFileName);
   
   // Get the running instance of the FairRootManager to access tree branches
   FairRootManager *ioman = FairRootManager::Instance();
@@ -190,7 +191,9 @@ void PatDataGenerator::FinishTask() {
 }
 
 
-
+void TSMomDataGenerator::SetFileName(TString name) {
+  dataFileName = name;
+}
 
 
 

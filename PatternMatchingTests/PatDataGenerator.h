@@ -26,6 +26,7 @@ class PatDataGenerator: public FairTask {
 public:
   PatDataGenerator();
   virtual ~PatDataGenerator();
+  void SetFileName(TString name);
 
 protected:
   virtual void SetParContainers();
@@ -57,6 +58,9 @@ private:
 
   //  tree members
   Pattern *bPattern;
+  
+  // File name
+  TString dataFileName;
   
   ClassDef(PatDataGenerator,1)
 

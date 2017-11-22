@@ -41,7 +41,7 @@ int generateTSMomData(Int_t iJob = 0, TString inputFolder = "./") {
 
   // starts the pattern counter, no specific options at the moment
   TSMomDataGenerator *test = new TSMomDataGenerator();
-  test->SetSuffix(suffix);
+  test->SetFileName("../../data_new/data" + suffix + ".csv");
   fRun->AddTask(test);
   
 

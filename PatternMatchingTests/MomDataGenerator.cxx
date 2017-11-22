@@ -34,7 +34,7 @@ MomDataGenerator::MomDataGenerator() {
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
   fMCTrackArray = NULL;
-  suffix = "";
+  dataFileName = "./data.csv";
 }
 
 MomDataGenerator::~MomDataGenerator() {
@@ -49,7 +49,6 @@ void MomDataGenerator::SetParContainers() {
 InitStatus MomDataGenerator::Init() {
   
   // Create file
-  TString dataFileName = "../../data_new/data" + suffix + ".csv";
   csvFile.open(dataFileName);
   
   // Get the running instance of the FairRootManager to access tree branches
@@ -136,8 +135,8 @@ void MomDataGenerator::FinishTask() {
 }
 
 
-void MomDataGenerator::SetSuffix(TString suff) {
-  suffix = suff;
+void MomDataGenerator::SetFileName(TString name) {
+  dataFileName = name;
 }
 
 

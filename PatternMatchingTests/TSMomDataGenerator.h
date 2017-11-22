@@ -26,7 +26,7 @@ class TSMomDataGenerator: public FairTask {
 public:
   TSMomDataGenerator();
   virtual ~TSMomDataGenerator();
-  void SetSuffix(TString suff);
+  void SetFileName(TString name);
 
 protected:
   virtual void SetParContainers();
@@ -53,8 +53,8 @@ private:
   //  tree members
   Pattern *bPattern;
   
-  // Suffix
-  TString suffix;
+  // File name
+  TString dataFileName;
   
   ClassDef(TSMomDataGenerator,1)
 
