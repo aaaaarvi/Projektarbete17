@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-nJobs=73
+nJobs=43
 nEventsPerJob=1000
 
 JOBFILE="job.sh"
 OUTPUTDIR="../../data_new/"
 
-iJob=44
+iJob=1
 while [ $iJob -le $nJobs ]; do
   JOBFILE="job$iJob.sh"
   
@@ -15,9 +15,9 @@ while [ $iJob -le $nJobs ]; do
   echo "nEvents=$nEventsPerJob" >> $JOBFILE
   echo "iJob=$iJob" >> $JOBFILE
   #echo 'root -q -b sim.C"($nEvents,$iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
-  echo 'root -q -b digi.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
-  echo 'root -q -b recoideal.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
-  echo 'root -q -b generateTSMomData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  #echo 'root -q -b digi.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  #echo 'root -q -b recoideal.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  echo 'root -q -b generatePatData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   
   chmod 755 $JOBFILE
   ./$JOBFILE

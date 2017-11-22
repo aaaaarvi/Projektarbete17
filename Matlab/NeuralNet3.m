@@ -3,15 +3,11 @@ clear;
 %% INITIALIZATION
 
 % Load data
-load('../../mat/dataMom.mat');
+load('../../mat/dataPat.mat');
 
 % Number of training and testing points (images)
 Ntrain = 1000000;
 Ntest = 2000;
-
-% Choose number of PCA components
-NcompSTT = 1000;
-NcompFTS = 2000;
 
 % Load and save flags
 load_flag = 0;
@@ -21,10 +17,6 @@ save_flag = 1;
 gamma_min = 0.001;
 gamma_max = 0.001;
 
-% Minimum momentum difference
-minDiff1 = 100; % percent
-minDiff2 = 1e-2; % absolute
-
 % Dropout parameter
 pkeep = 1;
 
@@ -33,13 +25,12 @@ epochSize = 100;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
-n = NcompSTT + NcompFTS;   % Number of input neurons
-%n = NtubesSTT + NtubesFTS;   % Number of input neurons
-s1 = 200;                    % 1:st hidden layer
-s2 = 100;                    % 2:nd hidden layer
-s3 = 80;                     % 3:rd hidden layer
-s4 = 40;                     % 4:th hidden layer
-m = 8;                       % Number of output neurons
+n = NtubesSTT;   % Number of input neurons
+s1 = 200;        % 1:st hidden layer
+s2 = 100;        % 2:nd hidden layer
+s3 = 100;        % 3:rd hidden layer
+s4 = 200;        % 4:th hidden layer
+m = NtubesSTT;   % Number of output neurons
 
 % Activation functions
 sigma1  = @relu;
@@ -50,20 +41,18 @@ sigma3  = @relu;
 sigma3g = @relu_grad;
 sigma4  = @relu;
 sigma4g = @relu_grad;
-sigmay  = @lin;
-sigmayg = @lin_grad;
+sigmay  = @sigmoid;
+sigmayg = @sigmoid_grad;
 
 % Loss function
-loss  = @quadraticLoss;
-lossg = @quadraticLoss_grad;
+loss  = @crossEntropyLoss2;
+lossg = @crossEntropyLoss2_grad;
 
 % Standard deviation for the initial random weights
-st_dev = 0.05;
+st_dev = 0.1;
 
-% Transform data
-Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
-Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
-T = [Tstt, Tfts];
+% Transform data (not currently relevant)
+T = Tstt;
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
@@ -111,6 +100,8 @@ C_test = zeros(Nep, 1);
 predAcc_test = zeros(Nep, 1);
 predAcc_train = zeros(Nep, 1);
 predAccMax = 0;
+jaccard_train = zeros(Nep, 1);
+jaccard_test = zeros(Nep, 1);
 if load_flag == 1
     load('../../mat/weights.mat', ...
         'W1', 'W2', 'W3', 'W4', 'Wy', ...
@@ -164,10 +155,13 @@ for ep = 1:Nep
         C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
         
         % Compute the training prediction accuracy
-        if sum(100*abs(Yh - Y)./abs(Y) > minDiff1) == 0 || ...
-                sum(abs(Yh - Y) > minDiff2) == 0
-            predAcc_train(ep) = predAcc_train(ep) + 100/epochSize;
-        end
+        predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y)/n)/epochSize;
+        
+        % Compute the training Jaccard index
+        M11 = sum(round(Yh) == 1 && Yh == 1);
+        M01 = sum(round(Yh) == 0 && Yh == 1);
+        M10 = sum(round(Yh) == 1 && Yh == 0);
+        jaccard_train(ep) = jaccard_train(ep) + M11/(M11 + M01 + M10)/epochSize;
         
         % Backpropagate
         delta_y = sigmayg(Yp)*lossg(Yh, Y);
@@ -246,7 +240,7 @@ for ep = 1:Nep
     B4 = B4 - gamma*dB4;%.*(rand(size(B4)) > dropout);
     By = By - gamma*dBy;%.*(rand(size(By)) > dropout);
     
-    % Compute the test loss and prediction accuracy
+    % Compute the test loss, prediction accuracy and Jaccard index
     C_temp = 0;
     for k = idx_test
         X = T(k, :)';
@@ -262,10 +256,11 @@ for ep = 1:Nep
         Yh = sigmay(Yp);
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
-        if sum(100*abs(Yh - Y)./abs(Y) > minDiff1) == 0 || ...
-                sum(abs(Yh - Y) > minDiff2) == 0
-            predAcc_test(ep) = predAcc_test(ep) + 100/Ntest;
-        end
+        predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y)/n)/epochSize;
+        M11 = sum(round(Yh) == 1 && Yh == 1);
+        M01 = sum(round(Yh) == 0 && Yh == 1);
+        M10 = sum(round(Yh) == 1 && Yh == 0);
+        jaccard_test(ep) = jaccard_test(ep) + M11/(M11 + M01 + M10)/epochSize;
     end
     
     % Update predAccMax and save the weights
@@ -296,12 +291,14 @@ for ep = 1:Nep
         ep, C_train(ep), predAcc_test(ep), maxWeight, mean(mean(abs(W1))));
     
     % Plot the error and prediction accuracy
-    subplot(1, 2, 1);
+    subplot(1, 3, 1);
     plot(1:ep, C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
     title('Loss');
     xlabel('Epoch number');
     if strcmp(func2str(loss), 'crossEntropyLoss')
         ylabel('Cross-entropy loss');
+    elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+        ylabel('Cross-entropy loss (alternate)');
     elseif strcmp(func2str(loss), 'quadraticLoss')
         ylabel('Quadratic loss');
     else
@@ -309,12 +306,19 @@ for ep = 1:Nep
     end
     legend('training loss', 'test loss');
     grid on;
-    subplot(1, 2, 2);
+    subplot(1, 3, 2);
     plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
     title('Prediction accuracy');
     xlabel('Epoch number');
     ylabel('Accuracy in %');
     legend('training accuracy', 'test accuracy', 'Location', 'southeast');
+    grid on;
+    subplot(1, 3, 3);
+    plot(1:ep, jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
+    title('Jaccard index');
+    xlabel('Epoch number');
+    ylabel('Jaccard value');
+    legend('training Jaccard index', 'test Jaccard index', 'Location', 'southeast');
     grid on;
     
     % Display progress
@@ -342,12 +346,14 @@ Y = A(k, :)'
 
 % Plot the error and prediction accuracy
 figure;
-subplot(1, 2, 1);
+subplot(1, 3, 1);
 plot(1:ep, C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
 title('Loss');
 xlabel('Epoch number');
 if strcmp(func2str(loss), 'crossEntropyLoss')
     ylabel('Cross-entropy loss');
+elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+    ylabel('Cross-entropy loss (alternate)');
 elseif strcmp(func2str(loss), 'quadraticLoss')
     ylabel('Quadratic loss');
 else
@@ -355,12 +361,19 @@ else
 end
 legend('training loss', 'test loss');
 grid on;
-subplot(1, 2, 2);
+subplot(1, 3, 2);
 plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
 title('Prediction accuracy');
 xlabel('Epoch number');
 ylabel('Accuracy in %');
 legend('training accuracy', 'test accuracy');
+grid on;
+subplot(1, 3, 3);
+plot(1:ep, jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
+title('Jaccard index');
+xlabel('Epoch number');
+ylabel('Jaccard value');
+legend('training Jaccard index', 'test Jaccard index', 'Location', 'southeast');
 grid on;
 
 % Display the best prediction accuracy

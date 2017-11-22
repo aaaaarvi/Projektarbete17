@@ -64,10 +64,8 @@ InitStatus PatDataGenerator::Init() {
     return kFATAL;
   }
   
-  
   // Access the STTHit branch
   fSTTHitArray = (TClonesArray*) ioman->GetObject("STTHit");
-  // Initialize the STT map and get an array of all tubes
 
   // Get the ID of the STTHit branch for accessing the FairLinks later
   sttBranchID = ioman->GetBranchId("STTHit");
@@ -85,7 +83,8 @@ InitStatus PatDataGenerator::Init() {
   trackCands = (TClonesArray*) ioman->GetObject("SttMvdGemIdealTrackCand");
   if (!trackCands) {
     std::cout << "-E- PatternDBGenerator:Init: SttMvdGemIdealTrackCand not fount!" << std::endl;
-  }  
+  }
+  
   // Initialization successful
   std::cout << "-I- PatternDBGenerator: Initialisation successful" << std::endl;
   return kSUCCESS;
@@ -96,49 +95,48 @@ void PatDataGenerator::Exec(Option_t* opt) {
   PndMCTrack *mcTrack;
   PndSttHit *sttHit;
   PndFtsHit *ftsHit;
+  PndTrackCand *cand;
+  FairMultiLinkedData sttLinks;
+  
   // Get FairRootManager instance to access objects through FairLinks
   FairRootManager *ioman = FairRootManager::Instance();
   
   // Get the number of track candidates
   int nTrackCands = trackCands->GetEntriesFast();
   
-  //csvFile << nTrackCands << "\n";
-  
-  int nTubesSTT = fSTTHitArray->GetEntriesFast();
-  // Write the momenta of the particles
-  PndTrackCand *cand;
-  FairMultiLinkedData sttLinks;
   // Print the number of tube hits
+  int nTubesSTT = fSTTHitArray->GetEntriesFast();
   csvFile << nTubesSTT;
   
+  // Print the number of tube hits created by the final state proton
   int nTubes = 0;
-  
   for (int iTrack = 0; iTrack < nTrackCands; ++iTrack) {
     cand = (PndTrackCand*) (trackCands->At(iTrack));
     FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
     FairLink mcTrackLink = mcTrackLinks.GetLink(0);
     mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
 
-    if (mcTrack->GetPdgCode()==2212 && mcTrack->GetMotherID() == -1){
-       sttLinks = cand->GetLinksWithType(sttBranchID);
-       nTubes += sttLinks.GetNLinks();
-   }
+    if (mcTrack->GetPdgCode() == 2212 && mcTrack->GetMotherID() == -1) {
+      sttLinks = cand->GetLinksWithType(sttBranchID);
+      nTubes += sttLinks.GetNLinks();
+    }
   }
   csvFile << "," << nTubes;
   
-  // Print the STT tube IDs
+  // Print all the STT tube IDs
   for (int iTube = 0; iTube < nTubesSTT; ++iTube) {
     sttHit = (PndSttHit*) (fSTTHitArray->At(iTube));
     csvFile << "," << sttHit->GetTubeID();
   }
   
   
-  // Loop over all track candidates and write the tube IDs into the file
+  // Loop over all track candidates and write the tube IDs associated with the final state proton
   for (int iTrack = 0; iTrack < nTrackCands; ++iTrack) {
     
     // Get the next track candidate
     cand = (PndTrackCand*) (trackCands->At(iTrack));
     
+    // Get the MC track
     FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
     FairLink mcTrackLink = mcTrackLinks.GetLink(0);
     mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
@@ -147,16 +145,13 @@ void PatDataGenerator::Exec(Option_t* opt) {
     sttLinks = cand->GetLinksWithType(sttBranchID);
     
     // Write the tube IDs to the csv file
-    //csvFile << ", p";
-    if (mcTrack->GetPdgCode()==2212 && mcTrack->GetMotherID() == -1){
-    for (int iLink = 0; iLink < sttLinks.GetNLinks(); ++iLink) {
-      
-      FairLink sttLink = sttLinks.GetLink(iLink);
-      sttHit = (PndSttHit*) (ioman->GetCloneOfLinkData(sttLink));
-      
-      csvFile << ", p" << sttHit->GetTubeID();
+    if (mcTrack->GetPdgCode() == 2212 && mcTrack->GetMotherID() == -1) {
+      for (int iLink = 0; iLink < sttLinks.GetNLinks(); ++iLink) {
+        FairLink sttLink = sttLinks.GetLink(iLink);
+        sttHit = (PndSttHit*) (ioman->GetCloneOfLinkData(sttLink));
+        csvFile << "," << sttHit->GetTubeID();
+      }
     }
-   }
   }
   
   csvFile << "\n";
