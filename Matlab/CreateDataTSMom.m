@@ -10,7 +10,7 @@ clear;
 % Data properties
 NtubesSTT = 4542;
 NtubesFTS = 12224; % 13056
-Nfiles = 19;
+Nfiles = 100;
 Nevents = 1000;
 
 % Choose number of PCA components
