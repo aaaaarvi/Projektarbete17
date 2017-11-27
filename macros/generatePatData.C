@@ -1,3 +1,4 @@
+//This file runs PatDataGenerator.cxx
 int generatePatData(Int_t iJob = 0, TString inputFolder = "./") {
 
   Int_t nEvents = 0;
@@ -41,7 +42,7 @@ int generatePatData(Int_t iJob = 0, TString inputFolder = "./") {
 
   // starts the pattern counter, no specific options at the moment
   PatDataGenerator *test = new PatDataGenerator();
-  test->SetFileName("../../data_new/data" + suffix + ".csv");
+  test->SetFileName("../../data_new/dataPat" + suffix + ".csv");
   fRun->AddTask(test);
   
 

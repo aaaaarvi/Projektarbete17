@@ -1,8 +1,20 @@
 /*
- * TSMomDataGenerator.cxx
+ * PatDataGenerator.cxx
  *
- *  Created on: Nov 2, 2017
- *      Author: vagrant
+ *  Created on: Nov 2017
+ *      Author: Adam Hedkvist & Arvi Jonnarth
+ 
+ This file generates data that is written into a csv file. The data contains the number of STThits and all the tubeIDs of the STThits. 
+ Aswell as all the number of FtsHits and all the tubeIDs of the FtsHits.
+ It also saves the timeStamps of all SttHits and FtsHits, however the current version of Pandaroot have not implemented timestamps for the fts (November 2017).
+ This data is mainly used in CreateDataTSMom.m to preprocess the data before training it in a neural network.
+ 
+ 
+ The data is ordered in the following way:
+ 
+ NumberOfFinalStateParticles,PDGCode1,Xmoment,Ymoment ... PDGCode4,Xmoment,Ymoment,NumberOfSttHits,NumberOfFtsHits,SttHit1,SttTimeStamp1, ... TimeStampN, FtsHit1, FtsTimeStamp1
+ 
+ 
  */
 
 #include "TSMomDataGenerator.h"
@@ -34,7 +46,7 @@ TSMomDataGenerator::TSMomDataGenerator() {
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
   fMCTrackArray = NULL;
-  dataFileName = "./dataTS.csv";
+  dataFileName = "./dataTSMom.csv";
 }
 
 TSMomDataGenerator::~TSMomDataGenerator() {
@@ -119,10 +131,10 @@ void TSMomDataGenerator::Exec(Option_t* opt) {
     csvFile << "," << sttHit->GetTubeID() << "," << sttHit->GetTimeStamp()/100.;
   }
   
-  // Print the FTS tube IDs
+  // Print the FTS tube IDs, GetPulse gives some sort of timestamp until GetTimeStamp gets implemented
   for (int iTube = 0; iTube < nTubesFTS; ++iTube) {
     ftsHit = (PndFtsHit*) (fFTSHitArray->At(iTube));
-    csvFile << "," << ftsHit->GetTubeID();
+    csvFile << "," << ftsHit->GetTubeID() << "," << ftsHit->GetPulse()/100.;//ftsHit->GetTimeStamp()/100.;
   }
   
   csvFile << "\n";

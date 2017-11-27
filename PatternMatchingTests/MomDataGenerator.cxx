@@ -1,10 +1,20 @@
 /*
- * MomDataGenerator.cxx
+ * PatDataGenerator.cxx
  *
- *  Created on: Nov 2, 2017
- *      Author: vagrant
+ *  Created on: Nov 2017
+ *      Author: Adam Hedkvist & Arvi Jonnarth
+ 
+ This file generates data that is written into a csv file. The data contains the number of STThits and all the tubeIDs of the STThits. 
+ Aswell as all the number of FtsHits and all the tubeIDs of the FtsHits.
+ This data is mainly used in CreateDataMom.m to preprocess the data before training it in a neural network.
+ 
+ 
+ The data is ordered in the following way:
+ 
+ NumberOfFinalStateParticles,PDGCode1,Xmoment,Ymoment ... PDGCode4,Xmoment,Ymoment,NumberOfSttHits,NumberOfFtsHits,SttHit1, ... SttHitN, FtsHit1 .. FtsHitN
+ 
+ 
  */
-
 #include "MomDataGenerator.h"
 
 #include <FairMultiLinkedData.h>
@@ -34,7 +44,7 @@ MomDataGenerator::MomDataGenerator() {
   fSTTHitArray = NULL;
   fFTSHitArray = NULL;
   fMCTrackArray = NULL;
-  dataFileName = "./data.csv";
+  dataFileName = "./dataMom.csv";
 }
 
 MomDataGenerator::~MomDataGenerator() {

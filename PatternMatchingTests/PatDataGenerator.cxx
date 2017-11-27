@@ -1,8 +1,19 @@
 /*
  * PatDataGenerator.cxx
  *
- *  Created on: Nov 2, 2017
- *      Author: vagrant
+ *  Created on: Nov 2017
+ *      Author: Adam Hedkvist & Arvi Jonnarth
+ 
+ This file generates data that is written into a csv file. The data contains the number of STThits and all the tubeIDs of the STThits. 
+ It also saves all the STThits from the final state proton. It is mainly used in CreateDataPat.m to preprocess the data before training
+ it in a neural network.
+ 
+ 
+ The data is ordered in the following way:
+ 
+ NumberOfSttHits,NumberOfProtonsSttHits,SttHit1,SttHit2 ... SttHitN, ProtonSttHit1, ProtonSttHit2 .. ProtonSttHitN
+ 
+ 
  */
 
 #include "PatDataGenerator.h"

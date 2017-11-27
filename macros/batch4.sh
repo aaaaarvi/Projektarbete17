@@ -4,7 +4,7 @@ nJobs=130
 nEventsPerJob=1000
 
 JOBFILE="job.sh"
-OUTPUTDIR="../../data2/"
+OUTPUTDIR="../../data_new/"
 
 iJob=123
 while [ $iJob -le $nJobs ]; do
