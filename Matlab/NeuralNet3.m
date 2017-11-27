@@ -293,8 +293,8 @@ for ep = 1:Nep
         max(abs(min(min(dBy))), max(max(dBy)));
     
     % Display information
-    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.8f \n', ...
-        ep, C_train(ep), predAcc_test(ep), maxWeight, sum(full(Yh)));
+    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.4f (%.4f) \n', ...
+        ep, C_train(ep), predAcc_test(ep), maxWeight, sum(full(Yh)), sum(full(Y)));
     
     % Plot the error and prediction accuracy
     subplot(1, 3, 1);
