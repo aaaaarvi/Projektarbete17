@@ -10,7 +10,7 @@ clear;
 % Data properties
 NtubesSTT = 4542;
 NtubesFTS = 12224; % 13056
-Nfiles = 118;
+Nfiles = 100;
 Nevents = 1000;
 
 % Choose number of PCA components
@@ -23,7 +23,7 @@ Tfts = sparse(zeros(1, NtubesFTS));
 A = zeros(Nfiles*Nevents, 8);
 disp('Importing data...');
 for i = 1:Nfiles
-    csv = csvread(['../../data/dataMom_' num2str(i) '.csv']);
+    csv = csvread(['../../dataMom/dataMom_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
     j_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
@@ -99,8 +99,8 @@ Tfts(1,:) = [];
 % Save the data
 disp('Saving data...');
 Npoints = Nfiles*Nevents;
-save('../../mat/data.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts');
-%save('../../mat/data.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
+save('../../mat/dataMom.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts');
+%save('../../mat/dataMom.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
 %    'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
 disp('Done!');
 

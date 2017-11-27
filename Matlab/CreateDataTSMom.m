@@ -23,7 +23,7 @@ Tfts = sparse(zeros(1, NtubesFTS));
 A = zeros(Nfiles*Nevents, 8);
 disp('Importing data...');
 for i = 1:Nfiles
-    csv = csvread(['../../dataTS/dataTSMom_' num2str(i) '.csv']);
+    csv = csvread(['../../dataTSMom/dataTSMom_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
     j_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
@@ -68,11 +68,11 @@ for i = 1:Nfiles
             v_vect_stt(n_vals_stt) = csv(j, k + offsetSTT + 1);
             %Tstt(eventIdx, csv(j, k + offsetSTT)) = 1;
         end
-        for k = 1:hitsFTS
+        for k = 1:2:2*hitsFTS
             n_vals_fts = n_vals_fts + 1;
             i_vect_fts(n_vals_fts) = j;
             j_vect_fts(n_vals_fts) = csv(j, k + offsetFTS);
-            v_vect_fts(n_vals_fts) = 1;
+            v_vect_fts(n_vals_fts) = csv(j, k + offsetFTS + 1);
             %Tfts(eventIdx, csv(j, k + offsetFTS)) = 1;
         end
     end
@@ -99,8 +99,8 @@ Tfts(1,:) = [];
 % Save the data
 disp('Saving data...');
 Npoints = Nfiles*Nevents;
-save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts');
-%save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
+save('../../mat/dataTSMom.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts');
+%save('../../mat/dataTSMom.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
 %    'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
 disp('Done!');
 

@@ -39,8 +39,8 @@ epochSize = 100;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
-n1 = NcompSTT;   % Number of input neurons (STT data)
-n2 = NcompFTS;   % Number of input neurons (FTS data)
+n1 = NtubesSTT;  % Number of input neurons (STT data)
+n2 = NtubesFTS;  % Number of input neurons (FTS data)
 s1_1 = 200;      % 1:st hidden layer (STT data)
 s1_2 = 200;      % 1:st hidden layer (FTS data)
 s2_1 = 100;      % 2:nd hidden layer (STT data)
@@ -369,12 +369,12 @@ for ep = 1:Nep
     % Update predAccMax and save the weights
     if predAcc_test(ep) > predAccMax
         predAccMax = predAcc_test(ep);
-        if save_flag == 1
-            save('../../mat/weights.mat', ...
-                'W1_1', 'W1_2', 'W2_1', 'W2_2', 'W3_1', 'W3_2', 'W4', 'W5', 'Wy', ...
-                'B1_1', 'B1_2', 'B2_1', 'B2_2', 'B3', 'B4', 'B5', 'By', ...
-                'predAccMax', 'idx_train', 'idx_test');
-        end
+    end
+    if save_flag == 1
+        save('../../mat/weights.mat', ...
+            'W1_1', 'W1_2', 'W2_1', 'W2_2', 'W3_1', 'W3_2', 'W4', 'W5', 'Wy', ...
+            'B1_1', 'B1_2', 'B2_1', 'B2_2', 'B3', 'B4', 'B5', 'By', ...
+            'predAccMax', 'idx_train', 'idx_test');
     end
     
     % Compute the largest partial derivative
