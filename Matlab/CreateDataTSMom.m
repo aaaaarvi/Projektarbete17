@@ -1,3 +1,10 @@
+
+% Reformats the data set for training a neural network in the task of
+% regressing the momenta of four the final state particles using the tube
+% hits in the stt and fts together with the time stamps. It reads the data
+% from the csv-files dataTSMom* and creates the input and output matrices.
+% The possibility exists to use PCA as well.
+
 clear;
 
 % Data properties
@@ -16,7 +23,7 @@ Tfts = sparse(zeros(1, NtubesFTS));
 A = zeros(Nfiles*Nevents, 8);
 disp('Importing data...');
 for i = 1:Nfiles
-    csv = csvread(['../../dataTS/data_' num2str(i) '.csv']);
+    csv = csvread(['../../dataTS/dataTSMom_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
     j_vect_stt = zeros(csvSize(1)*csvSize(2), 1);
@@ -84,15 +91,18 @@ Tstt(1,:) = [];
 Tfts(1,:) = [];
 
 % Perform PCA
-disp('Starting PCA...');
-load('../../mat/dataTS.mat', 'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
+%disp('Starting PCA...');
+%load('../../mat/dataTS.mat', 'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
 %coeffSTT = pca(full(Tstt(1:50000,:)));%, 'NumComponents', NcompSTT);
 %coeffFTS = pca(full(Tfts(1:50000,:)));%, 'NumComponents', NcompFTS);
 
 % Save the data
+disp('Saving data...');
 Npoints = Nfiles*Nevents;
-save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
-    'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
+save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts');
+%save('../../mat/dataTS.mat', 'NtubesSTT', 'NtubesFTS', 'Npoints', 'A', 'Tstt', 'Tfts', ...
+%    'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');
+disp('Done!');
 
 
 

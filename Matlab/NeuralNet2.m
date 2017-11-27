@@ -1,3 +1,9 @@
+
+% Trains a neural network in the task of regressing the momenta of the
+% final state particles using the tube hits of the stt and fts (with or
+% without time stamps). The stt and fts do not share the same first hidden
+% layers but are branched separately.
+
 clear;
 
 %% INITIALIZATION
@@ -10,8 +16,8 @@ Ntrain = 1000000;
 Ntest = 2000;
 
 % Choose number of PCA components
-NcompSTT = NtubesSTT;%1000;
-NcompFTS = NtubesFTS;%2000;
+%NcompSTT = NtubesSTT;%1000;
+%NcompFTS = NtubesFTS;%2000;
 
 % Load and save flags
 load_flag = 0;
@@ -401,6 +407,8 @@ for ep = 1:Nep
     xlabel('Epoch number');
     if strcmp(func2str(loss), 'crossEntropyLoss')
         ylabel('Cross-entropy loss');
+    elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+        ylabel('Cross-entropy loss (alternate)');
     elseif strcmp(func2str(loss), 'quadraticLoss')
         ylabel('Quadratic loss');
     else
@@ -454,6 +462,8 @@ title('Loss');
 xlabel('Epoch number');
 if strcmp(func2str(loss), 'crossEntropyLoss')
     ylabel('Cross-entropy loss');
+elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+    ylabel('Cross-entropy loss (alternate)');
 elseif strcmp(func2str(loss), 'quadraticLoss')
     ylabel('Quadratic loss');
 else

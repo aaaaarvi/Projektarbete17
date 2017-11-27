@@ -1,3 +1,8 @@
+
+% Trains a neural network in the task of regressing the momenta of the
+% final state particles using the tube hits of the stt and fts (with or
+% without time stamps).
+
 clear;
 
 %% INITIALIZATION
@@ -10,8 +15,8 @@ Ntrain = 1000000;
 Ntest = 2000;
 
 % Choose number of PCA components
-NcompSTT = 1000;
-NcompFTS = 2000;
+%NcompSTT = 1000;
+%NcompFTS = 2000;
 
 % Load and save flags
 load_flag = 0;
@@ -33,8 +38,8 @@ epochSize = 100;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
-n = NcompSTT + NcompFTS;   % Number of input neurons
-%n = NtubesSTT + NtubesFTS;   % Number of input neurons
+%n = NcompSTT + NcompFTS;     % Number of input neurons
+n = NtubesSTT + NtubesFTS;   % Number of input neurons
 s1 = 200;                    % 1:st hidden layer
 s2 = 100;                    % 2:nd hidden layer
 s3 = 80;                     % 3:rd hidden layer
@@ -61,8 +66,8 @@ lossg = @quadraticLoss_grad;
 st_dev = 0.05;
 
 % Transform data
-Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
-Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
+%Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
+%Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
 T = [Tstt, Tfts];
 
 % Divide into training and testing indices
@@ -302,6 +307,8 @@ for ep = 1:Nep
     xlabel('Epoch number');
     if strcmp(func2str(loss), 'crossEntropyLoss')
         ylabel('Cross-entropy loss');
+    elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+        ylabel('Cross-entropy loss (alternate)');
     elseif strcmp(func2str(loss), 'quadraticLoss')
         ylabel('Quadratic loss');
     else
@@ -348,6 +355,8 @@ title('Loss');
 xlabel('Epoch number');
 if strcmp(func2str(loss), 'crossEntropyLoss')
     ylabel('Cross-entropy loss');
+elseif strcmp(func2str(loss), 'crossEntropyLoss2')
+    ylabel('Cross-entropy loss (alternate)');
 elseif strcmp(func2str(loss), 'quadraticLoss')
     ylabel('Quadratic loss');
 else

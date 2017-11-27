@@ -1,3 +1,9 @@
+
+% Reformats the data set for training a neural network in the task of
+% classifying which tube hits belong to the the final state proton. It
+% reads the data from the csv-files dataPat* and creates the input and
+% output matrices.
+
 clear;
 
 % Data properties
@@ -10,7 +16,7 @@ Tstt = sparse(zeros(1, NtubesSTT));
 A = sparse(zeros(1, NtubesSTT));
 disp('Importing data...');
 for i = 1:Nfiles
-    csv = csvread(['../../dataPat/data_' num2str(i) '.csv']);
+    csv = csvread(['../../dataPat/dataPat_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_T = zeros(csvSize(1)*csvSize(2), 1);
     j_vect_T = zeros(csvSize(1)*csvSize(2), 1);

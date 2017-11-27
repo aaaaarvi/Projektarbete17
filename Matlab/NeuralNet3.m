@@ -1,3 +1,7 @@
+
+% Trains a neural network in the task of classifying which tube hits of the
+% stt belong to the final state proton.
+
 clear;
 
 %% INITIALIZATION
