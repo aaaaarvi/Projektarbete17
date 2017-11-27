@@ -3,6 +3,6 @@
 
 function f = crossEntropyLoss2(Yh, Y)
 
-f = -Y'*log(max(1e-100, Yh)) - (1 - Y')*log(max(1e-100, 1 - Yh));
+f = -Y'*log(max(1e-100, Yh)) - (1 - Y')*log(max(1e-100, 1 - Yh))/1000;
 
 end

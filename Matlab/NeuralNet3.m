@@ -10,7 +10,7 @@ Ntrain = 1000000;
 Ntest = 2000;
 
 % Load and save flags
-load_flag = 0;
+load_flag = 1;
 save_flag = 1;
 
 % Learning rate
@@ -149,13 +149,16 @@ for ep = 1:Nep
         Z4 = sigma4(Z4tilde).*doZ4;
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
+        %Yh = Yh.*X;
         
         % Compute the training loss
         Y = A(im, :)';
         C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
         
         % Compute the training prediction accuracy
-        predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y)/m)/epochSize;
+        if sum(X) ~= 0
+            predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y & X == 1)/sum(X))/epochSize;
+        end
         
         % Compute the training Jaccard index
         jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
@@ -254,9 +257,12 @@ for ep = 1:Nep
         Z4 = sigma4(Z4tilde)*pkeep;
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
+        %Yh = Yh.*X;
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
-        predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y)/m)/Ntest;
+        if sum(X) ~= 0
+            predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y & X == 1)/sum(X))/Ntest;
+        end
         jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
         if ~isnan(jaccard)
             jaccard_test(ep) = jaccard_test(ep) + jaccard/Ntest;
@@ -266,12 +272,12 @@ for ep = 1:Nep
     % Update predAccMax and save the weights
     if predAcc_test(ep) > predAccMax
         predAccMax = predAcc_test(ep);
-        if save_flag == 1
-            save('../../mat/weights.mat', ...
-                'W1', 'W2', 'W3', 'W4', 'Wy', ...
-                'B1', 'B2', 'B3', 'B4', 'By', ...
-                'predAccMax', 'idx_train', 'idx_test');
-        end
+    end
+    if save_flag == 1
+        save('../../mat/weights.mat', ...
+            'W1', 'W2', 'W3', 'W4', 'Wy', ...
+            'B1', 'B2', 'B3', 'B4', 'By', ...
+            'predAccMax', 'idx_train', 'idx_test');
     end
     
     % Compute the largest partial derivative
@@ -287,8 +293,8 @@ for ep = 1:Nep
         max(abs(min(min(dBy))), max(max(dBy)));
     
     % Display information
-    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t mean(W1) = %.2e \n', ...
-        ep, C_train(ep), predAcc_test(ep), maxWeight, mean(mean(abs(W1))));
+    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.8f \n', ...
+        ep, C_train(ep), predAcc_test(ep), maxWeight, sum(full(Yh)));
     
     % Plot the error and prediction accuracy
     subplot(1, 3, 1);
@@ -304,21 +310,21 @@ for ep = 1:Nep
     else
         ylabel('Loss');
     end
-    legend('training loss', 'test loss');
+    legend('training loss', 'test loss', 'Location', 'northwest');
     grid on;
     subplot(1, 3, 2);
     plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
     title('Prediction accuracy');
     xlabel('Epoch number');
     ylabel('Accuracy in %');
-    legend('training accuracy', 'test accuracy', 'Location', 'southeast');
+    legend('training accuracy', 'test accuracy', 'Location', 'northwest');
     grid on;
     subplot(1, 3, 3);
     plot(1:ep, jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
     title('Jaccard index');
     xlabel('Epoch number');
     ylabel('Jaccard value');
-    legend('training Jaccard index', 'test Jaccard index', 'Location', 'southeast');
+    legend('training Jaccard index', 'test Jaccard index', 'Location', 'northwest');
     grid on;
     
     % Display progress
@@ -344,21 +350,21 @@ elseif strcmp(func2str(loss), 'quadraticLoss')
 else
     ylabel('Loss');
 end
-legend('training loss', 'test loss');
+legend('training loss', 'test loss', 'Location', 'northwest');
 grid on;
 subplot(1, 3, 2);
 plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
 title('Prediction accuracy');
 xlabel('Epoch number');
 ylabel('Accuracy in %');
-legend('training accuracy', 'test accuracy');
+legend('training accuracy', 'test accuracy', 'Location', 'northwest');
 grid on;
 subplot(1, 3, 3);
 plot(1:ep, jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
 title('Jaccard index');
 xlabel('Epoch number');
 ylabel('Jaccard value');
-legend('training Jaccard index', 'test Jaccard index', 'Location', 'southeast');
+legend('training Jaccard index', 'test Jaccard index', 'Location', 'northwest');
 grid on;
 
 % Display the best prediction accuracy
