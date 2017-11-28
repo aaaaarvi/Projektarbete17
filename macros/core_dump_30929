@@ -1,0 +1,33 @@
+#0  0x00007fd9c9a2c07a in __GI___waitpid (pid=30954, stat_loc=stat_loc
+entry=0x7fffa6b66400, options=options
+entry=0) at ../sysdeps/unix/sysv/linux/waitpid.c:29
+#1  0x00007fd9c99a4fbb in do_system (line=<optimized out>) at ../sysdeps/posix/system.c:148
+#2  0x00007fd9ca5916b4 in TUnixSystem::StackTrace() () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCore.so.6
+#3  0x00007fd9be14921b in FairLogger::LogFatalMessage (this=<optimized out>, strm=...) at /home/adam/fairsoft_may16p1/FairRoot-17.03/fairtools/FairLogger.cxx:576
+#4  0x00007fd9be149374 in FairLogger::endl (strm=...) at /home/adam/fairsoft_may16p1/FairRoot-17.03/fairtools/FairLogger.cxx:503
+#5  0x00007fd9be14678e in std::ostream::operator<< (__pf=0x7fd9be149320 <FairLogger::endl(std::ostream&)>, this=<optimized out>) at /usr/include/c++/5/ostream:113
+#6  FairLogger::operator<< (this=this
+entry=0x3783300, manip=0x7fd9be149320 <FairLogger::endl(std::ostream&)>) at /home/adam/fairsoft_may16p1/FairRoot-17.03/fairtools/FairLogger.cxx:470
+#7  0x00007fd9be8e96a1 in FairFileSource::CreateNewFriendChain (this=this
+entry=0x430b5a0, inputFile=<incomplete type>, inputLevel=<incomplete type>) at /home/adam/fairsoft_may16p1/FairRoot-17.03/base/source/FairFileSource.cxx:597
+#8  0x00007fd9be8ea420 in FairFileSource::AddFriendsToChain (this=this
+entry=0x430b5a0) at /home/adam/fairsoft_may16p1/FairRoot-17.03/base/source/FairFileSource.cxx:430
+#9  0x00007fd9be8eb60a in FairFileSource::Init (this=0x430b5a0) at /home/adam/fairsoft_may16p1/FairRoot-17.03/base/source/FairFileSource.cxx:302
+#10 0x00007fd9be8a1db1 in FairRootManager::InitSource (this=0x77188c0) at /home/adam/fairsoft_may16p1/FairRoot-17.03/base/steer/FairRootManager.cxx:150
+#11 0x00007fd9be8ae7ec in FairRunAna::Init (this=0x772b5e0) at /home/adam/fairsoft_may16p1/FairRoot-17.03/base/steer/FairRunAna.cxx:158
+#12 0x00007fd9cad12751 in generateTSMomData(int, TString) ()
+#13 0x00007fd9cad12052 in __cling_Un1Qu30(void*) ()
+#14 0x00007fd9c6a90654 in cling::Interpreter::RunFunction(clang::FunctionDecl const*, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#15 0x00007fd9c6a9635e in cling::Interpreter::EvaluateInternal(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::CompilationOptions, cling::Value*, cling::Transaction**) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#16 0x00007fd9c6a9650f in cling::Interpreter::echo(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#17 0x00007fd9c6b27202 in cling::MetaSema::actOnxCommand(llvm::StringRef, llvm::StringRef, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#18 0x00007fd9c6b35b16 in cling::MetaParser::isXCommand(cling::MetaSema::ActionResult&, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#19 0x00007fd9c6b35c1e in cling::MetaParser::isCommand(cling::MetaSema::ActionResult&, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#20 0x00007fd9c6b210e9 in cling::MetaProcessor::process(char const*, cling::Interpreter::CompilationResult&, cling::Value*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#21 0x00007fd9c6a1fe55 in TCling::ProcessLine(char const*, TInterpreter::EErrorCode*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#22 0x00007fd9c6a114c7 in TCling::ProcessLineSynch(char const*, TInterpreter::EErrorCode*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCling.so
+#23 0x00007fd9ca4ec8a7 in TApplication::ExecuteFile(char const*, int*, bool) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCore.so.6
+#24 0x00007fd9ca4ed7ff in TApplication::ProcessLine(char const*, bool, int*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libCore.so.6
+#25 0x00007fd9ca8fa3e5 in TRint::ProcessLineNr(char const*, char const*, int*) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libRint.so.6
+#26 0x00007fd9ca8fb8ff in TRint::Run(bool) () from /home/adam/fairsoft_may16p1/buildFairSoft/lib/root/libRint.so.6
+#27 0x000000000040109c in main ()

@@ -77,7 +77,8 @@ InitStatus PatDataGenerator::Init() {
   
   // Access the STTHit branch
   fSTTHitArray = (TClonesArray*) ioman->GetObject("STTHit");
-
+  // Access MCTrack pointers
+  fMCTrackArray = (TClonesArray*) ioman->GetObject("MCTrack");
   // Get the ID of the STTHit branch for accessing the FairLinks later
   sttBranchID = ioman->GetBranchId("STTHit");
   if (sttBranchID == -1) {
@@ -119,13 +120,6 @@ void PatDataGenerator::Exec(Option_t* opt) {
   int nTubesSTT = fSTTHitArray->GetEntriesFast();
   csvFile << nTubesSTT;
   
-  // This loop is needed somehow (don't ask us why)
-  for (int iTrack = 0; iTrack < nTrackCands; ++iTrack) {
-    cand = (PndTrackCand*) (trackCands->At(iTrack));
-    FairMultiLinkedData mcTrackLinks = cand->GetLinksWithType(mcTrackID);
-    FairLink mcTrackLink = mcTrackLinks.GetLink(0);
-    mcTrack = (PndMCTrack*) (ioman->GetCloneOfLinkData(mcTrackLink));
-  }
   
   // Print the number of tube hits created by the final state proton
   int nTubes = 0;
