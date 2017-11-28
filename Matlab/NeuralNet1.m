@@ -34,7 +34,7 @@ minDiff2 = 1e-2; % absolute
 pkeep = 1;
 
 % Epoch size
-epochSize = 100;
+epochSize = 1000;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons

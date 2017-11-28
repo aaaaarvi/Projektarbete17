@@ -25,7 +25,7 @@ gamma_max = 0.001;
 pkeep = 1;
 
 % Epoch size
-epochSize = 100;
+epochSize = 1000;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
