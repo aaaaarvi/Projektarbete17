@@ -10,7 +10,7 @@ clear;
 load('../../mat/dataPat.mat');
 
 % Number of training and testing points (images)
-Ntrain = 1000000;
+Ntrain = 10000000;
 Ntest = 2000;
 
 % Load and save flags
@@ -24,6 +24,12 @@ gamma_max = 0.001;
 % Dropout parameter
 pkeep = 1;
 
+% Threshold for classifying hits
+threshold = 0.99;
+
+% Standard deviation for the initial random weights
+st_dev = 0.12;
+
 % Epoch size
 epochSize = 1000;
 Nep = Ntrain/epochSize; % Nr of epochs
@@ -31,8 +37,8 @@ Nep = Ntrain/epochSize; % Nr of epochs
 % Number of neurons
 n = NtubesSTT;   % Number of input neurons
 s1 = 200;        % 1:st hidden layer
-s2 = 100;        % 2:nd hidden layer
-s3 = 100;        % 3:rd hidden layer
+s2 = 200;        % 2:nd hidden layer
+s3 = 200;        % 3:rd hidden layer
 s4 = 200;        % 4:th hidden layer
 m = NtubesSTT;   % Number of output neurons
 
@@ -46,14 +52,11 @@ sigma3g = @relu_grad;
 sigma4  = @relu;
 sigma4g = @relu_grad;
 sigmay  = @sigmoid;
-sigmayg = @sigmoid_grad;
+sigmayg = @sigmoid_grad2;
 
 % Loss function
 loss  = @crossEntropyLoss2;
 lossg = @crossEntropyLoss2_grad;
-
-% Standard deviation for the initial random weights
-st_dev = 0.1;
 
 % Transform data (not currently relevant)
 T = Tstt;
@@ -157,7 +160,6 @@ for ep = 1:Nep
         Z4 = sigma4(Z4tilde).*doZ4;
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
-        %Yh = Yh.*X;
         
         % Compute the training loss
         Y = A(im, :)';
@@ -165,17 +167,17 @@ for ep = 1:Nep
         
         % Compute the training prediction accuracy
         if sum(X) ~= 0
-            predAcc_train(ep) = predAcc_train(ep) + 100*(sum(round(Yh) == Y & X == 1)/sum(X))/epochSize;
+            predAcc_train(ep) = predAcc_train(ep) + 100*(sum((Yh > threshold) == Y & X == 1)/sum(X))/epochSize;
         end
         
         % Compute the training Jaccard index
-        jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
+        jaccard = 1 - pdist([((Yh > threshold).*X)'; Y'], 'jaccard');
         if ~isnan(jaccard)
             jaccard_train(ep) = jaccard_train(ep) + jaccard/epochSize;
         end
         
         % Backpropagate
-        delta_y = sigmayg(Yp)*lossg(Yh, Y);
+        delta_y = sigmayg(Yp).*lossg(Yh, Y);
         delta_4 = sigma4g(Z4tilde)*(Wy'*delta_y);
         delta_3 = sigma3g(Z3tilde)*(W4'*delta_4);
         delta_2 = sigma2g(Z2tilde)*(W3'*delta_3);
@@ -269,9 +271,9 @@ for ep = 1:Nep
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
         if sum(X) ~= 0
-            predAcc_test(ep) = predAcc_test(ep) + 100*(sum(round(Yh) == Y & X == 1)/sum(X))/Ntest;
+            predAcc_test(ep) = predAcc_test(ep) + 100*(sum((Yh > threshold) == Y & X == 1)/sum(X))/Ntest;
         end
-        jaccard = 1 - pdist([round(Yh)'; Y'], 'jaccard');
+        jaccard = 1 - pdist([((Yh > threshold).*X)'; Y'], 'jaccard');
         if ~isnan(jaccard)
             jaccard_test(ep) = jaccard_test(ep) + jaccard/Ntest;
         end
