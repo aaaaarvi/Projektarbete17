@@ -15,5 +15,6 @@
 #pragma link C++ class MomDataGenerator+;
 #pragma link C++ class TSMomDataGenerator+;
 #pragma link C++ class PatDataGenerator+;
+#pragma link C++ class ClassDataGenerator+;
 #endif
 

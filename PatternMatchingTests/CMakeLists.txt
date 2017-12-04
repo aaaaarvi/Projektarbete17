@@ -44,6 +44,7 @@ TestDataGenerator.cxx
 MomDataGenerator.cxx
 TSMomDataGenerator.cxx
 PatDataGenerator.cxx
+ClassDataGenerator.cxx
 
 )
 
