@@ -27,7 +27,6 @@ for i = 1:Nfiles
     v_vect_A = zeros(csvSize(1)*csvSize(2), 1);
     n_vals_A = 0;
     for j = 1:Nevents
-        eventIdx = j + (i-1)*Nevents;
         Nhits_tot = csv(j, 1);
         Nhits_p = csv(j, 2);
         
