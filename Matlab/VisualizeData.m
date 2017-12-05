@@ -23,14 +23,6 @@ threshold = 0.9;
 % Dropout parameter
 pkeep = 1;
 
-% Number of neurons
-n = NtubesSTT;   % Number of input neurons
-s1 = 200;        % 1:st hidden layer
-s2 = 200;        % 2:nd hidden layer
-s3 = 200;        % 3:rd hidden layer
-s4 = 200;        % 4:th hidden layer
-m = NtubesSTT;   % Number of output neurons
-
 % Activation functions
 sigma1  = @relu;
 sigma1g = @relu_grad;

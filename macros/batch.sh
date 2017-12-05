@@ -22,7 +22,8 @@ while [ $iJob -le $nJobs ]; do
   #echo 'root -q -b generateMomData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   #echo 'root -q -b generateTSMomData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   #echo 'root -q -b generatePatData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
-  echo 'root -q -b generateClassData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  echo 'root -q -b generateTSPatData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
+  #echo 'root -q -b generateClassData.C"($iJob,\"$OUTPUTDIR\")"' >> $JOBFILE
   
   chmod 755 $JOBFILE
   ./$JOBFILE
