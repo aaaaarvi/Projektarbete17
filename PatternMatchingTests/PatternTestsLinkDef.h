@@ -16,5 +16,6 @@
 #pragma link C++ class TSMomDataGenerator+;
 #pragma link C++ class PatDataGenerator+;
 #pragma link C++ class ClassDataGenerator+;
+#pragma link C++ class TestTubeGenerator+;
 #endif
 

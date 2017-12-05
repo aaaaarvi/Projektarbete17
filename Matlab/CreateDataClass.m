@@ -8,7 +8,7 @@ clear;
 
 % Data properties
 NtubesSTT = 4542;
-Nfiles = 100;
+Nfiles = 258;
 Npoints = 0;
 Ncols = 5;
 

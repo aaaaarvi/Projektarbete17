@@ -45,6 +45,7 @@ MomDataGenerator.cxx
 TSMomDataGenerator.cxx
 PatDataGenerator.cxx
 ClassDataGenerator.cxx
+TestTubeGenerator.cxx
 
 )
 
