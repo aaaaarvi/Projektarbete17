@@ -21,7 +21,7 @@ idx = idx_test;
 threshold = 0.9;
 
 % Dropout parameter
-%pkeep = 1;
+pkeep = 1;
 
 % Activation functions
 sigma1  = @relu;

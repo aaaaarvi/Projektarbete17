@@ -55,9 +55,15 @@ sigmayg = @softmax_grad;
 loss  = @crossEntropyLoss;
 lossg = @crossEntropyLoss_grad;
 
-% Transform data (not currently relevant)
-T = Tstt;
+% Transform data (balance classes)
 A = A(:, [1,4,5]);
+minClass = min(sum(A));
+idx_1 = randsample(find(A(:, 1) == 1), minClass);
+idx_2 = randsample(find(A(:, 2) == 1), minClass);
+idx_3 = randsample(find(A(:, 3) == 1), minClass);
+idx = sort([idx_1; idx_2; idx_3]);
+T = Tstt(idx, :);
+A = A(idx, :);
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
@@ -66,7 +72,7 @@ Ntest = min(Npoints/2, Ntest);
 % OR
 idx_keep = find(sum(A, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = 1:Ntest;%randsample(idx_keep, Ntest);
+idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
