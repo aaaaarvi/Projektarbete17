@@ -13,7 +13,7 @@ load('../../mat/dataTSMom.mat');
 
 % Number of training and testing points (images)
 Ntrain = 1000000;
-Ntest = 2000;
+Ntest = 100000;
 
 % Choose number of PCA components
 %NcompSTT = NtubesSTT;%1000;
@@ -87,7 +87,7 @@ Ntest = min(Npoints/2, Ntest);
 % OR
 idx_keep = find(sum(T, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = randsample(idx_keep, Ntest);
+idx_test = 1:Ntest;%randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
@@ -141,14 +141,7 @@ predAcc_test = zeros(Nep, 1);
 predAcc_train = zeros(Nep, 1);
 predAccMax = 0;
 if load_flag == 1
-    load('../../mat/weights2.mat', ...
-        'W1_1', 'W1_2', 'W2_1', 'W2_2', 'W3_1', 'W3_2', 'W4', 'W5', 'Wy', ...
-        'B1_1', 'B1_2', 'B2_1', 'B2_2', 'B3', 'B4', 'B5', 'By', ...
-        'mW1_1', 'mW1_2', 'mW2_1', 'mW2_2', 'mW3_1', 'mW3_2', 'mW4', 'mW5', 'mWy', ...
-        'mB1_1', 'mB1_2', 'mB2_1', 'mB2_2', 'mB3', 'mB4', 'mB5', 'mBy', ...
-        'vW1_1', 'vW1_2', 'vW2_1', 'vW2_2', 'vW3_1', 'vW3_2', 'vW4', 'vW5', 'vWy', ...
-        'vB1_1', 'vB1_2', 'vB2_1', 'vB2_2', 'vB3', 'vB4', 'vB5', 'vBy', ...
-        'predAccMax', 'idx_train', 'idx_test');
+    load('../../mat/weights2.mat');
 end
 
 % Loop through each epoch
@@ -343,7 +336,8 @@ for ep = 1:Nep
     
     % Compute the test loss and prediction accuracy
     C_temp = 0;
-    for k = idx_test
+    im_test = randsample(idx_test, epochSize);
+    for k = im_test
         X_1 = Tstt(k, :)';
         X_2 = Tfts(k, :)';
         Z1tilde_1 = (W1_1*X_1 + B1_1)*pkeep;
@@ -363,10 +357,10 @@ for ep = 1:Nep
         Yp = Wy*Z5 + By;
         Yh = sigmay(Yp);
         Y = A(k, :)';
-        C_test(ep) = C_test(ep) + loss(Yh, Y)/Ntest;
+        C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
         if sum(100*abs(Yh - Y)./abs(Y) > minDiff1) == 0 || ...
                 sum(abs(Yh - Y) > minDiff2) == 0
-            predAcc_test(ep) = predAcc_test(ep) + 100/Ntest;
+            predAcc_test(ep) = predAcc_test(ep) + 100/epochSize;
         end
     end
     
@@ -382,7 +376,7 @@ for ep = 1:Nep
             'mB1_1', 'mB1_2', 'mB2_1', 'mB2_2', 'mB3', 'mB4', 'mB5', 'mBy', ...
             'vW1_1', 'vW1_2', 'vW2_1', 'vW2_2', 'vW3_1', 'vW3_2', 'vW4', 'vW5', 'vWy', ...
             'vB1_1', 'vB1_2', 'vB2_1', 'vB2_2', 'vB3', 'vB4', 'vB5', 'vBy', ...
-            'predAccMax', 'idx_train', 'idx_test');
+            'predAccMax', 'idx_train', 'idx_test', 'pkeep');
     end
     
     % Compute the largest partial derivative
@@ -410,7 +404,7 @@ for ep = 1:Nep
     
     % Plot the error and prediction accuracy
     subplot(1, 2, 1);
-    plot(1:ep, C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
+    plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
     title('Loss');
     xlabel('Epoch number');
     if strcmp(func2str(loss), 'crossEntropyLoss')
@@ -425,7 +419,7 @@ for ep = 1:Nep
     legend('training loss', 'test loss');
     grid on;
     subplot(1, 2, 2);
-    plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
+    plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
     title('Prediction accuracy');
     xlabel('Epoch number');
     ylabel('Accuracy in %');
@@ -465,7 +459,7 @@ Y = A(k, :)'
 % Plot the error and prediction accuracy
 figure;
 subplot(1, 2, 1);
-plot(1:ep, C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
+plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
 title('Loss');
 xlabel('Epoch number');
 if strcmp(func2str(loss), 'crossEntropyLoss')
@@ -480,7 +474,7 @@ end
 legend('training loss', 'test loss');
 grid on;
 subplot(1, 2, 2);
-plot(1:ep, predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
+plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
 title('Prediction accuracy');
 xlabel('Epoch number');
 ylabel('Accuracy in %');
