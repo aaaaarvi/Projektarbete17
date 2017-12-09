@@ -8,11 +8,11 @@ clear;
 
 % Data properties
 NtubesSTT = 4542;
-Nfiles = 258;
+Nfiles = 400;
 Nevents = 1000;
 
 % Import data
-Tstt = sparse(zeros(1, NtubesSTT));
+Tstt = sparse(zeros(1, 2*NtubesSTT));
 A = sparse(zeros(1, NtubesSTT));
 disp('Importing data...');
 for i = 1:Nfiles
@@ -56,11 +56,11 @@ for i = 1:Nfiles
     % Concatenate the new matrices and take care of matrix dimensions
     temp = sparse(i_vect_T(1:n_vals_T), j_vect_T(1:n_vals_T), v_vect_T(1:n_vals_T));
     tempSize = size(temp);
-    temp2 = [[temp; zeros(1000 - tempSize(1), tempSize(2))], zeros(1000, 2*NtubesSTT - tempSize(2))];
+    temp2 = [[temp; zeros(Nevents - tempSize(1), tempSize(2))], zeros(Nevents, 2*NtubesSTT - tempSize(2))];
     Tstt = [Tstt; temp2];
     temp = sparse(i_vect_A(1:n_vals_A), j_vect_A(1:n_vals_A), v_vect_A(1:n_vals_A));
     tempSize = size(temp);
-    temp2 = [[temp; zeros(1000 - tempSize(1), tempSize(2))], zeros(1000, NtubesSTT - tempSize(2))];
+    temp2 = [[temp; zeros(Nevents - tempSize(1), tempSize(2))], zeros(Nevents, NtubesSTT - tempSize(2))];
     A = [A; temp2];
 end
 Tstt(1,:) = [];
@@ -69,7 +69,7 @@ A(1,:) = [];
 % Save the data
 disp('Saving data...');
 Npoints = Nfiles*Nevents;
-save('../../mat/dataPat.mat', 'NtubesSTT', 'Npoints', 'A', 'Tstt');
+save('../../mat/dataTSPat.mat', 'NtubesSTT', 'Npoints', 'A', 'Tstt');
 disp('Done!');
 
 

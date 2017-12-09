@@ -43,6 +43,8 @@ k = randsample(idx, 1);
 %k = 48975;
 %k = 69018;
 %k = 106120;
+%k = 116098;
+%k = 66321;
 
 % Feed forward
 X = T(k, :)';
@@ -105,7 +107,7 @@ ylim([-43, 43]);
 subplot(1, 2, 2);
 hold on;
 for i = 1:NtubesSTT
-    if X(i) == 1
+    %if X(i) == 1
         x = tubeData(i, 2);
         y = tubeData(i, 3);
         r = 0.5;
@@ -113,7 +115,7 @@ for i = 1:NtubesSTT
         c2 = 1 - Yh(i);
         c3 = 1 - Yh(i);
         plot(x, y, 'LineWidth', 1, 'Marker', 'o', 'Color', [c1, c2, c3]);
-    end
+    %end
 end
 xlim([-43, 43]);
 ylim([-43, 43]);

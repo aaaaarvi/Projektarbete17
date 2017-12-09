@@ -28,7 +28,7 @@ pkeep = 1;
 threshold = 0.99;
 
 % Standard deviation for the initial random weights
-st_dev = 0.12;
+st_dev = 0.05;
 
 % Epoch size
 epochSize = 1000;
@@ -36,10 +36,10 @@ Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
 n = 2*NtubesSTT; % Number of input neurons
-s1 = 200;        % 1:st hidden layer
+s1 = 400;        % 1:st hidden layer
 s2 = 200;        % 2:nd hidden layer
 s3 = 200;        % 3:rd hidden layer
-s4 = 200;        % 4:th hidden layer
+s4 = 400;        % 4:th hidden layer
 m = NtubesSTT;   % Number of output neurons
 
 % Activation functions
@@ -63,12 +63,9 @@ T = Tstt;
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
-%idx_test = randsample(Npoints, Ntest)';
-%idx_train = setdiff(1:Npoints, idx_test);
-% OR
 idx_keep = find(sum(T, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = 1:Ntest;%randsample(idx_keep, Ntest);
+idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
@@ -132,8 +129,7 @@ for ep = 1:Nep
     
     % Loop through each image in the epoch
     im_train = randsample(idx_train, epochSize);
-    for ex = 1:epochSize
-        im = im_train(ex);
+    for im = im_train
         
         % Dropout vectors
         doZ1 = 1*(rand(s1, 1) < pkeep);
@@ -235,19 +231,18 @@ for ep = 1:Nep
     dBy = mBy./(sqrt(vBy) + epsilon);
     
     % Update the weights
-    W1 = W1 - gamma*dW1;%.*(rand(size(W1)) > dropout);
-    W2 = W2 - gamma*dW2;%.*(rand(size(W2)) > dropout);
-    W3 = W3 - gamma*dW3;%.*(rand(size(W3)) > dropout);
-    W4 = W4 - gamma*dW4;%.*(rand(size(W4)) > dropout);
-    Wy = Wy - gamma*dWy;%.*(rand(size(Wy)) > dropout);
-    B1 = B1 - gamma*dB1;%.*(rand(size(B1)) > dropout);
-    B2 = B2 - gamma*dB2;%.*(rand(size(B2)) > dropout);
-    B3 = B3 - gamma*dB3;%.*(rand(size(B3)) > dropout);
-    B4 = B4 - gamma*dB4;%.*(rand(size(B4)) > dropout);
-    By = By - gamma*dBy;%.*(rand(size(By)) > dropout);
+    W1 = W1 - gamma*dW1;
+    W2 = W2 - gamma*dW2;
+    W3 = W3 - gamma*dW3;
+    W4 = W4 - gamma*dW4;
+    Wy = Wy - gamma*dWy;
+    B1 = B1 - gamma*dB1;
+    B2 = B2 - gamma*dB2;
+    B3 = B3 - gamma*dB3;
+    B4 = B4 - gamma*dB4;
+    By = By - gamma*dBy;
     
     % Compute the test loss, prediction accuracy and Jaccard index
-    C_temp = 0;
     im_test = randsample(idx_test, epochSize);
     for k = im_test
         X = T(k, :)';
@@ -261,7 +256,6 @@ for ep = 1:Nep
         Z4 = sigma4(Z4tilde)*pkeep;
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
-        %Yh = Yh.*X;
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
         if sum(X(1:NtubesSTT)) ~= 0

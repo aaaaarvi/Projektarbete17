@@ -82,12 +82,9 @@ T = [Tstt, Tfts];
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
-%idx_test = randsample(Npoints, Ntest)';
-%idx_train = setdiff(1:Npoints, idx_test);
-% OR
 idx_keep = find(sum(T, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = 1:Ntest;%randsample(idx_keep, Ntest);
+idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
@@ -170,8 +167,7 @@ for ep = 1:Nep
     
     % Loop through each image in the epoch
     im_train = randsample(idx_train, epochSize);
-    for ex = 1:epochSize
-        im = im_train(ex);
+    for im = im_train
         
         % Dropout vectors
         doZ1_1 = 1*(rand(s1_1, 1) < pkeep);
@@ -316,26 +312,25 @@ for ep = 1:Nep
     dBy = mBy./(sqrt(vBy) + epsilon);
     
     % Update the weights
-    W1_1 = W1_1 - gamma*dW1_1;%.*(rand(size(W1)) > dropout);
-    W1_2 = W1_2 - gamma*dW1_2;%.*(rand(size(W1)) > dropout);
-    W2_1 = W2_1 - gamma*dW2_1;%.*(rand(size(W2)) > dropout);
-    W2_2 = W2_2 - gamma*dW2_2;%.*(rand(size(W2)) > dropout);
-    W3_1 = W3_1 - gamma*dW3_1;%.*(rand(size(W2)) > dropout);
-    W3_2 = W3_2 - gamma*dW3_2;%.*(rand(size(W2)) > dropout);
-    W4 = W4 - gamma*dW4;%.*(rand(size(W4)) > dropout);
-    W5 = W5 - gamma*dW5;%.*(rand(size(W4)) > dropout);
-    Wy = Wy - gamma*dWy;%.*(rand(size(Wy)) > dropout);
-    B1_1 = B1_1 - gamma*dB1_1;%.*(rand(size(B1)) > dropout);
-    B1_2 = B1_2 - gamma*dB1_2;%.*(rand(size(B1)) > dropout);
-    B2_1 = B2_1 - gamma*dB2_1;%.*(rand(size(B1)) > dropout);
-    B2_2 = B2_2 - gamma*dB2_2;%.*(rand(size(B1)) > dropout);
-    B3 = B3 - gamma*dB3;%.*(rand(size(B3)) > dropout);
-    B4 = B4 - gamma*dB4;%.*(rand(size(B4)) > dropout);
-    B5 = B5 - gamma*dB5;%.*(rand(size(B4)) > dropout);
-    By = By - gamma*dBy;%.*(rand(size(By)) > dropout);
+    W1_1 = W1_1 - gamma*dW1_1;
+    W1_2 = W1_2 - gamma*dW1_2;
+    W2_1 = W2_1 - gamma*dW2_1;
+    W2_2 = W2_2 - gamma*dW2_2;
+    W3_1 = W3_1 - gamma*dW3_1;
+    W3_2 = W3_2 - gamma*dW3_2;
+    W4 = W4 - gamma*dW4;
+    W5 = W5 - gamma*dW5;
+    Wy = Wy - gamma*dWy;
+    B1_1 = B1_1 - gamma*dB1_1;
+    B1_2 = B1_2 - gamma*dB1_2;
+    B2_1 = B2_1 - gamma*dB2_1;
+    B2_2 = B2_2 - gamma*dB2_2;
+    B3 = B3 - gamma*dB3;
+    B4 = B4 - gamma*dB4;
+    B5 = B5 - gamma*dB5;
+    By = By - gamma*dBy;
     
     % Compute the test loss and prediction accuracy
-    C_temp = 0;
     im_test = randsample(idx_test, epochSize);
     for k = im_test
         X_1 = Tstt(k, :)';

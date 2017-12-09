@@ -80,11 +80,11 @@ for i = 1:Nfiles
     % Concatenate the new matrices and take care of matrix dimensions
     temp = sparse(i_vect_stt(1:n_vals_stt), j_vect_stt(1:n_vals_stt), v_vect_stt(1:n_vals_stt));
     tempSize = size(temp);
-    temp2 = [[temp; zeros(1000 - tempSize(1), tempSize(2))], zeros(1000, NtubesSTT - tempSize(2))];
+    temp2 = [[temp; zeros(Nevents - tempSize(1), tempSize(2))], zeros(Nevents, NtubesSTT - tempSize(2))];
     Tstt = [Tstt; temp2];
     temp = sparse(i_vect_fts(1:n_vals_fts), j_vect_fts(1:n_vals_fts), v_vect_fts(1:n_vals_fts));
     tempSize = size(temp);
-    temp2 = [[temp; zeros(1000 - tempSize(1), tempSize(2))], zeros(1000, NtubesFTS - tempSize(2))];
+    temp2 = [[temp; zeros(Nevents - tempSize(1), tempSize(2))], zeros(Nevents, NtubesFTS - tempSize(2))];
     Tfts = [Tfts; temp2];
 end
 Tstt(1,:) = [];

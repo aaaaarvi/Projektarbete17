@@ -69,12 +69,9 @@ T = Tstt;
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
-%idx_test = randsample(Npoints, Ntest)';
-%idx_train = setdiff(1:Npoints, idx_test);
-% OR
 idx_keep = find(sum(T, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = 1:Ntest;%randsample(idx_keep, Ntest);
+idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
@@ -124,7 +121,7 @@ predAccMax = 0;
 jaccard_train = zeros(Nep, 1);
 jaccard_test = zeros(Nep, 1);
 if load_flag == 1
-    load('../../mat/weights3.mat');
+    load('../../mat/weights3c.mat');
 end
 
 % Loop through each epoch
@@ -150,8 +147,7 @@ for ep = 1:Nep
     
     % Loop through each image in the epoch
     im_train = randsample(idx_train, epochSize);
-    for ex = 1:epochSize
-        im = im_train(ex);
+    for im = im_train
         
         % Dropout vectors
         doZ1 = 1*(rand(s1, 1) < pkeep);
@@ -281,23 +277,22 @@ for ep = 1:Nep
     dBy = mBy./(sqrt(vBy) + epsilon);
     
     % Update the weights
-    W1 = W1 - gamma*dW1;%.*(rand(size(W1)) > dropout);
-    W2 = W2 - gamma*dW2;%.*(rand(size(W2)) > dropout);
-    W3 = W3 - gamma*dW3;%.*(rand(size(W3)) > dropout);
-    W4 = W4 - gamma*dW4;%.*(rand(size(W4)) > dropout);
-    W5 = W5 - gamma*dW5;%.*(rand(size(W5)) > dropout);
-    W6 = W6 - gamma*dW6;%.*(rand(size(W6)) > dropout);
-    Wy = Wy - gamma*dWy;%.*(rand(size(Wy)) > dropout);
-    B1 = B1 - gamma*dB1;%.*(rand(size(B1)) > dropout);
-    B2 = B2 - gamma*dB2;%.*(rand(size(B2)) > dropout);
-    B3 = B3 - gamma*dB3;%.*(rand(size(B3)) > dropout);
-    B4 = B4 - gamma*dB4;%.*(rand(size(B4)) > dropout);
-    B5 = B5 - gamma*dB5;%.*(rand(size(B5)) > dropout);
-    B6 = B6 - gamma*dB6;%.*(rand(size(B6)) > dropout);
-    By = By - gamma*dBy;%.*(rand(size(By)) > dropout);
+    W1 = W1 - gamma*dW1;
+    W2 = W2 - gamma*dW2;
+    W3 = W3 - gamma*dW3;
+    W4 = W4 - gamma*dW4;
+    W5 = W5 - gamma*dW5;
+    W6 = W6 - gamma*dW6;
+    Wy = Wy - gamma*dWy;
+    B1 = B1 - gamma*dB1;
+    B2 = B2 - gamma*dB2;
+    B3 = B3 - gamma*dB3;
+    B4 = B4 - gamma*dB4;
+    B5 = B5 - gamma*dB5;
+    B6 = B6 - gamma*dB6;
+    By = By - gamma*dBy;
     
     % Compute the test loss, prediction accuracy and Jaccard index
-    C_temp = 0;
     im_test = randsample(idx_test, epochSize);
     for k = im_test
         X = T(k, :)';
@@ -315,7 +310,6 @@ for ep = 1:Nep
         Z6 = sigma6(Z6tilde)*pkeep;
         Yp = Wy*Z6 + By;
         Yh = sigmay(Yp);
-        %Yh = Yh.*X;
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
         if sum(X) ~= 0
@@ -332,7 +326,7 @@ for ep = 1:Nep
         predAccMax = predAcc_test(ep);
     end
     if save_flag == 1
-        save('../../mat/weights3.mat', ...
+        save('../../mat/weights3c.mat', ...
             'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Wy', ...
             'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'By', ...
             'mW1', 'mW2', 'mW3', 'mW4', 'mW5', 'mW6', 'mWy', ...
