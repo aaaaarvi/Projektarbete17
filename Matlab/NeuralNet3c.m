@@ -11,7 +11,7 @@ load('../../mat/dataPat.mat');
 
 % Number of training and testing points (images)
 Ntrain = 10000000;
-Ntest = 100000;
+Ntest = 10000;
 
 % Load and save flags
 load_flag = 0;

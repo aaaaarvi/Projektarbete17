@@ -12,7 +12,7 @@ load('../../mat/dataMom.mat');
 
 % Number of training and testing points (images)
 Ntrain = 1000000;
-Ntest = 100000;
+Ntest = 10000;
 
 % Choose number of PCA components
 %NcompSTT = 1000;

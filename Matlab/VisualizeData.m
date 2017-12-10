@@ -4,7 +4,7 @@ clear;
 %% Load stuff
 
 % Load weights
-load('../../mat/weights3_HLEdge400_HLMid200.mat');
+load('../../mat/weights3.mat');
 
 % Load event data
 load('../../mat/dataPat.mat');
