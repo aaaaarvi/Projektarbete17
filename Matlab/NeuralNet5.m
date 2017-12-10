@@ -11,18 +11,18 @@ load('../../mat/dataClass.mat');
 
 % Number of training and testing points (images)
 Ntrain = 10000000;
-Ntest = 100000;
+Ntest = 10000;
 
 % Load and save flags
 load_flag = 0;
 save_flag = 1;
 
 % Learning rate
-gamma_min = 0.001;
+gamma_min = 0.0001;
 gamma_max = 0.001;
 
 % Dropout parameter
-pkeep = 1;
+pkeep = 0.8;
 
 % Standard deviation for the initial random weights
 st_dev = 0.12;
@@ -248,13 +248,13 @@ for ep = 1:Nep
     for k = im_test
         X = T(k, :)';
         Z1tilde = (W1*X + B1)*pkeep;
-        Z1 = sigma1(Z1tilde)*pkeep;
+        Z1 = sigma1(Z1tilde);
         Z2tilde = (W2*Z1 + B2)*pkeep;
-        Z2 = sigma2(Z2tilde)*pkeep;
+        Z2 = sigma2(Z2tilde);
         Z3tilde = (W3*Z2 + B3)*pkeep;
-        Z3 = sigma3(Z3tilde)*pkeep;
+        Z3 = sigma3(Z3tilde);
         Z4tilde = (W4*Z3 + B4)*pkeep;
-        Z4 = sigma4(Z4tilde)*pkeep;
+        Z4 = sigma4(Z4tilde);
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
         Y = A(k, :)';
