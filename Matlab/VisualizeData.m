@@ -4,7 +4,7 @@ clear;
 %% Load stuff
 
 % Load weights
-load('../../mat/weights3.mat');
+load('../../mat/weights3_HLEdge400_HLMid200.mat');
 
 % Load event data
 load('../../mat/dataPat.mat');
@@ -18,7 +18,7 @@ tubeData = csvread('../../mat/tubeData.csv');
 idx = idx_test;
 
 % Threshold for classifying hits
-threshold = 0.9;
+threshold = 0.99;
 
 % Dropout parameter
 pkeep = 1;
@@ -40,11 +40,12 @@ T = Tstt;
 
 % Event index
 k = randsample(idx, 1);
-%k = 48975;
+k = 48975;
 %k = 69018;
 %k = 106120;
 %k = 116098;
 %k = 66321;
+%k = 232050;
 
 % Feed forward
 X = T(k, :)';
