@@ -113,14 +113,16 @@ C_test = zeros(Nep, 1);
 predAcc_test = zeros(Nep, 1);
 predAcc_train = zeros(Nep, 1);
 predAccMax = 0;
+ep_start = 1;
 if load_flag == 1
     load('../../mat/weights1.mat');
+    ep_start = ep + 1;
 end
 
 % Loop through each epoch
 figure;
 h = waitbar(0, 'Training the neurual network...');
-for ep = 1:Nep
+for ep = ep_start:Nep
     
     % Initialize the weight and bias changes
     dW1 = zeros(s1, n);
@@ -278,7 +280,8 @@ for ep = 1:Nep
             'mB1', 'mB2', 'mB3', 'mB4', 'mBy', ...
             'vW1', 'vW2', 'vW3', 'vW4', 'vWy', ...
             'vB1', 'vB2', 'vB3', 'vB4', 'vBy', ...
-            'predAccMax', 'idx_train', 'idx_test', 'pkeep');
+            'predAccMax', 'idx_train', 'idx_test', 'pkeep', ...
+            'ep', 'C_train', 'C_test', 'predAcc_test', 'predAcc_train');
     end
     
     % Compute the largest partial derivative
