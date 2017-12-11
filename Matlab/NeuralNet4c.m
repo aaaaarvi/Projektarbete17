@@ -122,7 +122,7 @@ jaccard_train = zeros(Nep, 1);
 jaccard_test = zeros(Nep, 1);
 ep_start = 1;
 if load_flag == 1
-    load('../../mat/weights4b.mat');
+    load('../../mat/weights4c.mat');
     ep_start = ep + 1;
 end
 
@@ -328,7 +328,7 @@ for ep = ep_start:Nep
         predAccMax = predAcc_test(ep);
     end
     if save_flag == 1
-        save('../../mat/weights4b.mat', ...
+        save('../../mat/weights4c.mat', ...
             'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Wy', ...
             'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'By', ...
             'mW1', 'mW2', 'mW3', 'mW4', 'mW5', 'mW6', 'mWy', ...
