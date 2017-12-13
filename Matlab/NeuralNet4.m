@@ -28,7 +28,7 @@ pkeep = 1;
 threshold = 0.99;
 
 % Standard deviation for the initial random weights
-st_dev = 0.05;
+st_dev = 0.07;
 
 % Epoch size
 epochSize = 1000;
