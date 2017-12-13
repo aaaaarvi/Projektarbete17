@@ -90,6 +90,10 @@ end
 Tstt(1,:) = [];
 Tfts(1,:) = [];
 
+% Make sure that elements are only 0 or 1
+Tstt(Tstt ~= 0) = 1;
+Tfts(Tfts ~= 0) = 1;
+
 % Perform PCA
 %disp('Starting PCA...');
 %load('../../mat/data.mat', 'NcompSTT', 'NcompFTS', 'coeffSTT', 'coeffFTS');

@@ -68,6 +68,7 @@ Yh_th = zeros(size(Yh));
 Yh_th(Yh > threshold) = 1;
 
 % Plot the input data
+figure;
 subplot(1, 2, 1);
 hold on;
 for i = 1:NtubesSTT

@@ -72,6 +72,10 @@ end
 Tstt(1,:) = [];
 A(1,:) = [];
 
+% Make sure that elements are only 0 or 1
+Tstt(Tstt ~= 0) = 1;
+A(A ~= 0) = 1;
+
 % Save the data
 disp('Saving data...');
 save('../../mat/dataClass.mat', 'NtubesSTT', 'Npoints', 'Ncols', 'A', 'Tstt');

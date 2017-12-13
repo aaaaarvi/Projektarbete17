@@ -64,15 +64,16 @@ end
 plot(thresholds, pred_acc);
 %}
 
+%
 % Filter out events with too many hits
-cluster_sizes = 0:1:200;
+cluster_sizes = 0:1:100;
 pred_acc = zeros(length(cluster_sizes), 1);
 for i = 1:length(cluster_sizes)
     disp(['i = ' num2str(i)]);
     N = 0;
     for k = idx
         X = T(k, :)';
-        if sum(X) > cluster_sizes(i)
+        if sum(X(1:NtubesSTT)) <= cluster_sizes(i)
             continue;
         end
         N = N + 1;
@@ -99,6 +100,31 @@ end
 
 % Plot
 plot(cluster_sizes, pred_acc);
+%
+
+
+%{
+N1 = 0;
+N2 = 0;
+h1 = 0;
+h2 = 0;
+for k = idx
+    X = T(k, :)';
+    Y = A(k, :)';
+    if sum(X(1:NtubesSTT)) <= 100
+        N1 = N1 + 1;
+        h1 = h1 + 1*(sum(Y) ~= 0);
+    else
+        N2 = N2 + 1;
+        h2 = h2 + 1*(sum(Y) ~= 0);
+    end
+end
+%}
+
+
+
+
+
 
 
 

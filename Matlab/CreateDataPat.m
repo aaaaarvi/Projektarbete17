@@ -8,7 +8,7 @@ clear;
 
 % Data properties
 NtubesSTT = 4542;
-Nfiles = 258;
+Nfiles = 958;
 Nevents = 1000;
 
 % Import data
@@ -16,6 +16,7 @@ Tstt = sparse(zeros(1, NtubesSTT));
 A = sparse(zeros(1, NtubesSTT));
 disp('Importing data...');
 for i = 1:Nfiles
+    disp(['i = ' num2str(i)]);
     csv = csvread(['../../dataPat/dataPat_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_T = zeros(csvSize(1)*csvSize(2), 1);
@@ -61,6 +62,10 @@ for i = 1:Nfiles
 end
 Tstt(1,:) = [];
 A(1,:) = [];
+
+% Make sure that elements are only 0 or 1
+Tstt(Tstt ~= 0) = 1;
+A(A ~= 0) = 1;
 
 % Save the data
 disp('Saving data...');
