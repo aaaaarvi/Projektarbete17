@@ -8,18 +8,14 @@ clear;
 %% INITIALIZATION
 
 % Load data
-load('../../mat/dataMom.mat');
+load('../../mat/dataPatMom.mat');
 
 % Number of training and testing points (images)
 Ntrain = 1000000;
 Ntest = 10000;
 
-% Choose number of PCA components
-%NcompSTT = 1000;
-%NcompFTS = 2000;
-
 % Load and save flags
-load_flag = 0;
+load_flag = 1;
 save_flag = 1;
 
 % Learning rate
@@ -27,8 +23,8 @@ gamma_min = 0.001;
 gamma_max = 0.001;
 
 % Minimum momentum difference
-minDiff1 = 100; % percent
-minDiff2 = 1e-2; % absolute
+minDiff1 = 10; % percent
+minDiff2 = 1e-3; % absolute
 
 % Dropout parameter
 pkeep = 1;
@@ -38,13 +34,12 @@ epochSize = 1000;
 Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
-%n = NcompSTT + NcompFTS;     % Number of input neurons
-n = NtubesSTT + NtubesFTS;   % Number of input neurons
-s1 = 200;                    % 1:st hidden layer
-s2 = 100;                    % 2:nd hidden layer
-s3 = 80;                     % 3:rd hidden layer
-s4 = 40;                     % 4:th hidden layer
-m = 8;                       % Number of output neurons
+n = NtubesSTT;   % Number of input neurons
+s1 = 300;        % 1:st hidden layer
+s2 = 200;        % 2:nd hidden layer
+s3 = 100;        % 3:rd hidden layer
+s4 = 40;         % 4:th hidden layer
+m = 2;           % Number of output neurons
 
 % Activation functions
 sigma1  = @relu;
@@ -63,12 +58,10 @@ loss  = @quadraticLoss;
 lossg = @quadraticLoss_grad;
 
 % Standard deviation for the initial random weights
-st_dev = 0.05;
+st_dev = 0.07;
 
-% Transform data
-%Tstt = Tstt*coeffSTT(:, 1:NcompSTT);
-%Tfts = Tfts*coeffFTS(:, 1:NcompFTS);
-T = [Tstt, Tfts];
+% Transform data (not relevant here)
+T = Tstt;
 
 % Divide into training and testing indices
 Ntest = min(Npoints/2, Ntest);
