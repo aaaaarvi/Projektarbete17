@@ -16,6 +16,7 @@ Tstt = sparse(zeros(1, 2*NtubesSTT));
 A = sparse(zeros(1, NtubesSTT));
 disp('Importing data...');
 for i = 1:Nfiles
+    disp(['i = ' num2str(i)]);
     csv = csvread(['../../dataTSPat/dataTSPat_' num2str(i) '.csv']);
     csvSize = size(csv);
     i_vect_T = zeros(csvSize(1)*csvSize(2), 1);
@@ -29,19 +30,28 @@ for i = 1:Nfiles
     for j = 1:Nevents
         Nhits_tot = csv(j, 1);
         Nhits_p = csv(j, 2);
+        i_temp_T = j*ones(2*Nhits_tot, 1);
+        j_temp_T = zeros(2*Nhits_tot, 1);
+        v_temp_T = zeros(2*Nhits_tot, 1);
+        n_temp_T = 0;
         
         % Assemble the input matrix T
         offset = 2;
         for k = 1:2:2*Nhits_tot
-            n_vals_T = n_vals_T + 1;
-            i_vect_T(n_vals_T) = j;
-            j_vect_T(n_vals_T) = csv(j, k + offset);
-            v_vect_T(n_vals_T) = 1;
-            n_vals_T = n_vals_T + 1;
-            i_vect_T(n_vals_T) = j;
-            j_vect_T(n_vals_T) = csv(j, k + offset) + NtubesSTT;
-            v_vect_T(n_vals_T) = csv(j, k + offset + 1);
+            if ismember(csv(j, k + offset), j_temp_T)
+                continue;
+            end
+            n_temp_T = n_temp_T + 1;
+            j_temp_T(n_temp_T) = csv(j, k + offset);
+            v_temp_T(n_temp_T) = 1;
+            n_temp_T = n_temp_T + 1;
+            j_temp_T(n_temp_T) = csv(j, k + offset) + NtubesSTT;
+            v_temp_T(n_temp_T) = csv(j, k + offset + 1);
         end
+        i_vect_T( (n_vals_T+1):(n_vals_T+n_temp_T) ) = i_temp_T(1:n_temp_T);
+        j_vect_T( (n_vals_T+1):(n_vals_T+n_temp_T) ) = j_temp_T(1:n_temp_T);
+        v_vect_T( (n_vals_T+1):(n_vals_T+n_temp_T) ) = v_temp_T(1:n_temp_T);
+        n_vals_T = n_vals_T + n_temp_T;
         
         % Assmble the output matrix A
         offset = 2 + 2*Nhits_tot;
@@ -65,6 +75,9 @@ for i = 1:Nfiles
 end
 Tstt(1,:) = [];
 A(1,:) = [];
+
+% Make sure that the A matrix only contains 0 and 1
+A(A ~= 0) = 1;
 
 % Save the data
 disp('Saving data...');

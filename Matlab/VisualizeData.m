@@ -48,6 +48,7 @@ k = randsample(idx, 1);
 %k = 232050;
 %k = 2808;
 %k = 151663;
+%k = 2359;
 
 % Feed forward
 X = T(k, :)';

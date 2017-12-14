@@ -109,6 +109,7 @@ void PatDataGenerator::Exec(Option_t* opt) {
   PndFtsHit *ftsHit;
   PndTrackCand *cand;
   FairMultiLinkedData sttLinks;
+  TVector3 momentum;
   
   // Get FairRootManager instance to access objects through FairLinks
   FairRootManager *ioman = FairRootManager::Instance();
@@ -132,9 +133,10 @@ void PatDataGenerator::Exec(Option_t* opt) {
     if (mcTrack->GetPdgCode() == 2212 && mcTrack->GetMotherID() == -1) {
       sttLinks = cand->GetLinksWithType(sttBranchID);
       nTubes += sttLinks.GetNLinks();
+      momentum = mcTrack->GetMomentum();
     }
   }
-  csvFile << "," << nTubes;
+  csvFile << "," << nTubes << "," << momentum.Px() << "," << momentum.Py();
   
   // Print all the STT tube IDs
   for (int iTube = 0; iTube < nTubesSTT; ++iTube) {

@@ -32,12 +32,12 @@ sigmayg = @sigmoid_grad2;
 % Transform data (not currently relevant)
 T = Tstt;
 
-%{
+%
 % Loop over threshold values
 thresholds = 0.98:0.001:1;
 pred_acc = zeros(length(thresholds), 1);
 for i = 1:length(thresholds)
-    disp(i);
+    disp(['i = ' num2str(i) '/' num2str(length(thresholds))]);
     th = thresholds(i);
     for k = idx
         X = T(k, :)';
@@ -64,16 +64,17 @@ end
 plot(thresholds, pred_acc);
 %}
 
-%
+
+%{
 % Filter out events with too many hits
-cluster_sizes = 0:1:100;
+cluster_sizes = 0:10:100;
 pred_acc = zeros(length(cluster_sizes), 1);
 for i = 1:length(cluster_sizes)
     disp(['i = ' num2str(i)]);
     N = 0;
     for k = idx
         X = T(k, :)';
-        if sum(X(1:NtubesSTT)) <= cluster_sizes(i)
+        if sum(X(1:NtubesSTT)) > cluster_sizes(i)
             continue;
         end
         N = N + 1;
@@ -100,7 +101,7 @@ end
 
 % Plot
 plot(cluster_sizes, pred_acc);
-%
+%}
 
 
 %{

@@ -36,10 +36,10 @@ Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
 n = 2*NtubesSTT; % Number of input neurons
-s1 = 400;        % 1:st hidden layer
+s1 = 300;        % 1:st hidden layer
 s2 = 200;        % 2:nd hidden layer
 s3 = 200;        % 3:rd hidden layer
-s4 = 400;        % 4:th hidden layer
+s4 = 300;        % 4:th hidden layer
 m = NtubesSTT;   % Number of output neurons
 
 % Activation functions
