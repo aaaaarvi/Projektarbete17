@@ -14,7 +14,7 @@ Ntrain = 10000000;
 Ntest = 10000;
 
 % Load and save flags
-load_flag = 0;
+load_flag = 1;
 save_flag = 1;
 
 % Learning rate

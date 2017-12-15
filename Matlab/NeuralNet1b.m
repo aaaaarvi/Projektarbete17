@@ -115,7 +115,7 @@ predAcc_train = zeros(Nep, 1);
 predAccMax = 0;
 ep_start = 1;
 if load_flag == 1
-    load('../../mat/weights1.mat');
+    load('../../mat/weights1b.mat');
     ep_start = ep + 1;
 end
 
@@ -303,7 +303,7 @@ for ep = ep_start:Nep
         predAccMax = predAcc_test(ep);
     end
     if save_flag == 1
-        save('../../mat/weights1.mat', ...
+        save('../../mat/weights1b.mat', ...
             'n', 's1', 's2', 's3', 's4', 's5', 'm', ...
             'W1', 'W2', 'W3', 'W4', 'W5', 'Wy', ...
             'B1', 'B2', 'B3', 'B4', 'B5', 'By', ...
