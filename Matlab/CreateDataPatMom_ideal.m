@@ -8,7 +8,7 @@ clear;
 
 % Data properties
 NtubesSTT = 4542;
-Nfiles = 100;
+Nfiles = 400;
 Nevents = 1000;
 
 % Import data

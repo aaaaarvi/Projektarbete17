@@ -14,7 +14,7 @@ Ntrain = 10000000;
 Ntest = 10000;
 
 % Load and save flags
-load_flag = 0;
+load_flag = 1;
 save_flag = 1;
 
 % Learning rate
@@ -28,7 +28,7 @@ pkeep = 1;
 threshold = 0.99;
 
 % Standard deviation for the initial random weights
-st_dev = 0.1;
+st_dev = 0.07;
 
 % Epoch size
 epochSize = 1000;
@@ -37,10 +37,10 @@ Nep = Ntrain/epochSize; % Nr of epochs
 % Number of neurons
 n = NtubesSTT;   % Number of input neurons
 s1 = 400;        % 1:st hidden layer
-s2 = 200;        % 2:nd hidden layer
-s3 = 100;        % 3:rd hidden layer
-s4 = 100;        % 4:th hidden layer
-s5 = 200;        % 5:th hidden layer
+s2 = 300;        % 2:nd hidden layer
+s3 = 300;        % 3:rd hidden layer
+s4 = 300;        % 4:th hidden layer
+s5 = 300;        % 5:th hidden layer
 s6 = 400;        % 6:th hidden layer
 m = NtubesSTT;   % Number of output neurons
 

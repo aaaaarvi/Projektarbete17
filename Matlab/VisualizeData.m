@@ -3,16 +3,16 @@ clear;
 
 %% Load stuff
 
-% Load weights
-load('../../mat/weights3.mat');
-
 % Load event data
 load('../../mat/dataPat.mat');
 
 % Import tube position data
 tubeData = csvread('../../mat/tubeData.csv');
 
-%% Plot stuff
+%% Plot tube hits
+
+% Load weights
+load('../../mat/weights3.mat');
 
 % Choose subset (train or test data)
 idx = idx_test;
@@ -53,13 +53,13 @@ k = randsample(idx, 1);
 % Feed forward
 X = T(k, :)';
 Z1tilde = (W1*X + B1)*pkeep;
-Z1 = sigma1(Z1tilde)*pkeep;
+Z1 = sigma1(Z1tilde);
 Z2tilde = (W2*Z1 + B2)*pkeep;
-Z2 = sigma2(Z2tilde)*pkeep;
+Z2 = sigma2(Z2tilde);
 Z3tilde = (W3*Z2 + B3)*pkeep;
-Z3 = sigma3(Z3tilde)*pkeep;
+Z3 = sigma3(Z3tilde);
 Z4tilde = (W4*Z3 + B4)*pkeep;
-Z4 = sigma4(Z4tilde)*pkeep;
+Z4 = sigma4(Z4tilde);
 Yp = Wy*Z4 + By;
 Yh = sigmay(Yp);
 Y = A(k, :)';
@@ -123,6 +123,26 @@ for i = 1:NtubesSTT
 end
 xlim([-43, 43]);
 ylim([-43, 43]);
+
+
+%% Plot momentum vector
+
+% Load weights
+load('../../mat/weights1.mat');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

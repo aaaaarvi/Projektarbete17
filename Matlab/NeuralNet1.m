@@ -23,8 +23,8 @@ gamma_min = 0.001;
 gamma_max = 0.001;
 
 % Minimum momentum difference
-minDiff1 = 10; % percent
-minDiff2 = 1e-3; % absolute
+minDiff1 = 10;   % percent (of magnitude)
+minDiff2 = 5;    % absolute (of angle in degrees)
 
 % Dropout parameter
 pkeep = 1;
@@ -157,8 +157,13 @@ for ep = ep_start:Nep
         C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
         
         % Compute the training prediction accuracy
-        if sum(100*abs(Yh - Y)./abs(Y) > minDiff1) == 0 || ...
-                sum(abs(Yh - Y) > minDiff2) == 0
+        [theta1, rho1] = cart2pol(Y(1), Y(2));
+        [theta2, rho2] = cart2pol(Yh(1), Yh(2));
+        theta1 = theta1*180/pi;
+        theta2 = theta2*180/pi;
+        theta_diff = theta2 - theta1;
+        if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
+                (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
             predAcc_train(ep) = predAcc_train(ep) + 100/epochSize;
         end
         
@@ -255,8 +260,13 @@ for ep = ep_start:Nep
         Yh = sigmay(Yp);
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
-        if sum(100*abs(Yh - Y)./abs(Y) > minDiff1) == 0 || ...
-                sum(abs(Yh - Y) > minDiff2) == 0
+        [theta1, rho1] = cart2pol(Y(1), Y(2));
+        [theta2, rho2] = cart2pol(Yh(1), Yh(2));
+        theta1 = theta1*180/pi;
+        theta2 = theta2*180/pi;
+        theta_diff = theta2 - theta1;
+        if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
+                (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
             predAcc_test(ep) = predAcc_test(ep) + 100/epochSize;
         end
     end
