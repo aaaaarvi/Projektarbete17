@@ -25,21 +25,19 @@ pkeep = 1;
 
 % Activation functions
 sigma1  = @relu;
-sigma1g = @relu_grad;
 sigma2  = @relu;
-sigma2g = @relu_grad;
 sigma3  = @relu;
-sigma3g = @relu_grad;
 sigma4  = @relu;
-sigma4g = @relu_grad;
 sigmay  = @sigmoid;
-sigmayg = @sigmoid_grad2;
 
 % Transform data (not currently relevant)
 T = Tstt;
 
 % Event index
 k = randsample(idx, 1);
+while sum(A(k, :)) == 0
+    k = randsample(idx, 1);
+end
 %k = 48975;
 %k = 69018;
 %k = 106120;
@@ -49,6 +47,10 @@ k = randsample(idx, 1);
 %k = 2808;
 %k = 151663;
 %k = 2359;
+%k = 625;
+%k = 4591;
+%k = 1144;
+%k = 7035;
 
 % Feed forward
 X = T(k, :)';
@@ -66,11 +68,24 @@ Y = A(k, :)';
 
 % Thresholded values
 Yh_th = zeros(size(Yh));
-Yh_th(Yh > threshold) = 1;
+Yh_th(Yh > threshold & X == 1) = 1;
+
+% Compute prediction accuracy
+pred_acc = 100*(sum(Yh_th == Y & X == 1)/sum(X));
 
 % Plot the input data
 subplot(1, 2, 1);
 hold on;
+viscircles([0, 0], 41.5, 'Color', 'k');
+x = 15;
+y1 = 8.75;
+y2 = 17.5;
+plot([0, x], [y2, y1], '-k', 'LineWidth', 2);
+plot([x, x], [y1, -y1], '-k', 'LineWidth', 2);
+plot([x, 0], [-y1, -y2], '-k', 'LineWidth', 2);
+plot([0, -x], [-y2, -y1], '-k', 'LineWidth', 2);
+plot([-x, -x], [-y1, y1], '-k', 'LineWidth', 2);
+plot([-x, 0], [y1, y2], '-k', 'LineWidth', 2);
 for i = 1:NtubesSTT
     
     % Outline
@@ -128,9 +143,67 @@ ylim([-43, 43]);
 %% Plot momentum vector
 
 % Load weights
-load('../../mat/weights1.mat');
+load('../../mat/weights1.mat', 'pkeep', ...
+    'W1', 'W2', 'W3', 'W4', 'Wy', ...
+    'B1', 'B2', 'B3', 'B4', 'By');
 
+% Load event data
+clear T Tstt A;
+load('../../mat/dataPatMom.mat');
 
+% Activation functions
+sigma1  = @relu;
+sigma2  = @relu;
+sigma3  = @relu;
+sigma4  = @relu;
+sigmay  = @lin;
+
+% Transform data (not currently relevant)
+T = Tstt;
+
+% Feed forward
+%X = T(k, :)';
+X = Yh_th;
+Z1tilde = (W1*X + B1)*pkeep;
+Z1 = sigma1(Z1tilde);
+Z2tilde = (W2*Z1 + B2)*pkeep;
+Z2 = sigma2(Z2tilde);
+Z3tilde = (W3*Z2 + B3)*pkeep;
+Z3 = sigma3(Z3tilde);
+Z4tilde = (W4*Z3 + B4)*pkeep;
+Z4 = sigma4(Z4tilde);
+Yp = Wy*Z4 + By;
+Yh = sigmay(Yp);
+Y = A(k, :)';
+
+% Compute prediction error
+[theta1, rho1] = cart2pol(Y(1), Y(2));
+[theta2, rho2] = cart2pol(Yh(1), Yh(2));
+theta1 = theta1*180/pi;
+theta2 = theta2*180/pi;
+theta_diff = theta2 - theta1;
+rho_error = 100*abs(rho2 - rho1)/rho1;
+theta_error = min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]);
+
+% Plot
+subplot(1, 2, 2);
+hold on;
+viscircles([0, 0], 41.5, 'Color', 'k');
+x = 15;
+y1 = 8.75;
+y2 = 17.5;
+plot([0, x], [y2, y1], '-k', 'LineWidth', 2);
+plot([x, x], [y1, -y1], '-k', 'LineWidth', 2);
+plot([x, 0], [-y1, -y2], '-k', 'LineWidth', 2);
+plot([0, -x], [-y2, -y1], '-k', 'LineWidth', 2);
+plot([-x, -x], [-y1, y1], '-k', 'LineWidth', 2);
+plot([-x, 0], [y1, y2], '-k', 'LineWidth', 2);
+scale = 50;
+quiver(0, 0, scale*Y(1), scale*Y(2), ':b', 'LineWidth', 2, 'MaxHeadSize', 1);
+quiver(0, 0, scale*Yh(1), scale*Yh(2), '-b', 'LineWidth', 2, 'MaxHeadSize', 1);
+legend(['acc = ' num2str(pred_acc) ' %'], ...
+    ['\delta\rho = ' num2str(rho_error) ' %'], ...
+    ['\delta\theta = ' num2str(theta_error) '\circ']);
 
 
 

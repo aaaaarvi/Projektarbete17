@@ -14,7 +14,7 @@ Ntrain = 10000000;
 Ntest = 10000;
 
 % Load and save flags
-load_flag = 1;
+load_flag = 0;
 save_flag = 1;
 
 % Learning rate
@@ -329,6 +329,7 @@ for ep = ep_start:Nep
     end
     if save_flag == 1
         save('../../mat/weights3c.mat', ...
+            'n', 's1', 's2', 's3', 's4', 's5', 's6', 'm', ...
             'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Wy', ...
             'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'By', ...
             'mW1', 'mW2', 'mW3', 'mW4', 'mW5', 'mW6', 'mWy', ...
