@@ -51,6 +51,7 @@ end
 %k = 4591;
 %k = 1144;
 %k = 7035;
+%k = 4749;
 
 % Feed forward
 X = T(k, :)';
@@ -74,6 +75,7 @@ Yh_th(Yh > threshold & X == 1) = 1;
 pred_acc = 100*(sum(Yh_th == Y & X == 1)/sum(X));
 
 % Plot the input data
+figure('pos', [10, 500, 1200, 480]);
 subplot(1, 2, 1);
 hold on;
 viscircles([0, 0], 41.5, 'Color', 'k');
@@ -198,6 +200,7 @@ plot([x, 0], [-y1, -y2], '-k', 'LineWidth', 2);
 plot([0, -x], [-y2, -y1], '-k', 'LineWidth', 2);
 plot([-x, -x], [-y1, y1], '-k', 'LineWidth', 2);
 plot([-x, 0], [y1, y2], '-k', 'LineWidth', 2);
+
 scale = 50;
 quiver(0, 0, scale*Y(1), scale*Y(2), ':b', 'LineWidth', 2, 'MaxHeadSize', 1);
 quiver(0, 0, scale*Yh(1), scale*Yh(2), '-b', 'LineWidth', 2, 'MaxHeadSize', 1);
