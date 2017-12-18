@@ -1,16 +1,17 @@
 
-% Trains a neural network in the task of classifying which tube hits of the
-% stt belong to the final state proton.
+% Trains a neural network in the task of regressing the momenta of the
+% final state particles using the tube hits of the stt and fts (with or
+% without time stamps).
 
 clear;
 
 %% INITIALIZATION
 
 % Load data
-load('../../mat/dataPat.mat');
+load('../../mat/dataPatMom.mat');
 
 % Number of training and testing points (images)
-Ntrain = 2000000;
+Ntrain = 1000000;
 Ntest = 10000;
 
 % Load and save flags
@@ -18,17 +19,15 @@ load_flag = 0;
 save_flag = 1;
 
 % Learning rate
-gamma_min = 0.001;
-gamma_max = 0.001;
+gamma_min = 0.0001;
+gamma_max = 0.002;
+
+% Minimum momentum difference
+minDiff1 = 10;   % percent (of magnitude)
+minDiff2 = 5;    % absolute (of angle in degrees)
 
 % Dropout parameter
 pkeep = 1;
-
-% Threshold for classifying hits
-threshold = 0.99;
-
-% Standard deviation for the initial random weights
-st_dev = 0.07;
 
 % Epoch size
 epochSize = 1000;
@@ -36,11 +35,13 @@ Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
 n = NtubesSTT;   % Number of input neurons
-s1 = 300;        % 1:st hidden layer
-s2 = 200;        % 2:nd hidden layer
+s1 = 400;        % 1:st hidden layer
+s2 = 300;        % 2:nd hidden layer
 s3 = 200;        % 3:rd hidden layer
-s4 = 300;        % 4:th hidden layer
-m = NtubesSTT;   % Number of output neurons
+s4 = 100;        % 4:th hidden layer
+s5 = 50;         % 5:th hidden layer
+s6 = 30;         % 6:th hidden layer
+m = 2;           % Number of output neurons
 
 % Activation functions
 sigma1  = @relu;
@@ -51,14 +52,21 @@ sigma3  = @relu;
 sigma3g = @relu_grad;
 sigma4  = @relu;
 sigma4g = @relu_grad;
-sigmay  = @sigmoid;
-sigmayg = @sigmoid_grad2;
+sigma5  = @relu;
+sigma5g = @relu_grad;
+sigma6  = @relu;
+sigma6g = @relu_grad;
+sigmay  = @lin;
+sigmayg = @lin_grad;
 
 % Loss function
-loss  = @crossEntropyLoss2;
-lossg = @crossEntropyLoss2_grad;
+loss  = @quadraticLoss;
+lossg = @quadraticLoss_grad;
 
-% Transform data (not currently relevant)
+% Standard deviation for the initial random weights
+st_dev = 0.08;
+
+% Transform data (not relevant here)
 T = Tstt;
 
 % Divide into training and testing indices
@@ -73,11 +81,15 @@ W1 = st_dev*randn(s1, n);    % Weights to 1:st hidden layer
 W2 = st_dev*randn(s2, s1);   % Weights to 2:nd hidden layer
 W3 = st_dev*randn(s3, s2);   % Weights to 3:rd hidden layer
 W4 = st_dev*randn(s4, s3);   % Weights to 4:th hidden layer
-Wy = st_dev*randn(m, s4);    % Weights to output layer
+W5 = st_dev*randn(s5, s4);   % Weights to 5:th hidden layer
+W6 = st_dev*randn(s6, s5);   % Weights to 6:th hidden layer
+Wy = st_dev*randn(m, s6);    % Weights to output layer
 B1 = st_dev*ones(s1, 1);     % Biases to 1:st hidden layer
 B2 = st_dev*ones(s2, 1);     % Biases to 2:nd hidden layer
 B3 = st_dev*ones(s3, 1);     % Biases to 3:rd hidden layer
 B4 = st_dev*ones(s4, 1);     % Biases to 4:th hidden layer
+B5 = st_dev*ones(s5, 1);     % Biases to 5:th hidden layer
+B6 = st_dev*ones(s6, 1);     % Biases to 6:th hidden layer
 By = st_dev*ones(m, 1);      % Biases to output layer
 
 % Parameters for the Adam Optimizer
@@ -88,11 +100,15 @@ mW1 = zeros(s1, n);   vW1 = zeros(s1, n);
 mW2 = zeros(s2, s1);  vW2 = zeros(s2, s1);
 mW3 = zeros(s3, s2);  vW3 = zeros(s3, s2);
 mW4 = zeros(s4, s3);  vW4 = zeros(s4, s3);
-mWy = zeros(m, s4);   vWy = zeros(m, s4);
+mW5 = zeros(s5, s4);  vW5 = zeros(s5, s4);
+mW6 = zeros(s6, s5);  vW6 = zeros(s6, s5);
+mWy = zeros(m, s6);   vWy = zeros(m, s6);
 mB1 = zeros(s1, 1);   vB1 = zeros(s1, 1);
 mB2 = zeros(s2, 1);   vB2 = zeros(s2, 1);
 mB3 = zeros(s3, 1);   vB3 = zeros(s3, 1);
 mB4 = zeros(s4, 1);   vB4 = zeros(s4, 1);
+mB5 = zeros(s5, 1);   vB5 = zeros(s5, 1);
+mB6 = zeros(s6, 1);   vB6 = zeros(s6, 1);
 mBy = zeros(m, 1);    vBy = zeros(m, 1);
 
 
@@ -104,11 +120,9 @@ C_test = zeros(Nep, 1);
 predAcc_test = zeros(Nep, 1);
 predAcc_train = zeros(Nep, 1);
 predAccMax = 0;
-jaccard_train = zeros(Nep, 1);
-jaccard_test = zeros(Nep, 1);
 ep_start = 1;
 if load_flag == 1
-    load('../../mat/weights3.mat');
+    load('../../mat/weights1c.mat');
     ep_start = ep + 1;
 end
 
@@ -122,11 +136,15 @@ for ep = ep_start:Nep
     dW2 = zeros(s2, s1);
     dW3 = zeros(s3, s2);
     dW4 = zeros(s4, s3);
-    dWy = zeros(m, s4);
+    dW5 = zeros(s5, s4);
+    dW6 = zeros(s6, s5);
+    dWy = zeros(m, s6);
     dB1 = zeros(s1, 1);
     dB2 = zeros(s2, 1);
     dB3 = zeros(s3, 1);
     dB4 = zeros(s4, 1);
+    dB5 = zeros(s5, 1);
+    dB6 = zeros(s6, 1);
     dBy = zeros(m, 1);
     
     % Loop through each image in the epoch
@@ -138,6 +156,8 @@ for ep = ep_start:Nep
         doZ2 = 1*(rand(s2, 1) < pkeep);
         doZ3 = 1*(rand(s3, 1) < pkeep);
         doZ4 = 1*(rand(s4, 1) < pkeep);
+        %doZ5 = 1*(rand(s5, 1) < pkeep);
+        %doZ6 = 1*(rand(s6, 1) < pkeep);
         
         % Forward propagation (with dropout)
         X = T(im, :)';
@@ -149,7 +169,11 @@ for ep = ep_start:Nep
         Z3 = sigma3(Z3tilde).*doZ3;
         Z4tilde = (W4*Z3 + B4).*doZ4;
         Z4 = sigma4(Z4tilde).*doZ4;
-        Yp = Wy*Z4 + By;
+        Z5tilde = (W5*Z4 + B5);
+        Z5 = sigma5(Z5tilde);
+        Z6tilde = (W6*Z5 + B6);
+        Z6 = sigma6(Z6tilde);
+        Yp = Wy*Z6 + By;
         Yh = sigmay(Yp);
         
         % Compute the training loss
@@ -157,19 +181,21 @@ for ep = ep_start:Nep
         C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
         
         % Compute the training prediction accuracy
-        if sum(X) ~= 0
-            predAcc_train(ep) = predAcc_train(ep) + 100*(sum((Yh > threshold) == Y & X == 1)/sum(X))/epochSize;
-        end
-        
-        % Compute the training Jaccard index
-        jaccard = 1 - pdist([((Yh > threshold).*X)'; Y'], 'jaccard');
-        if ~isnan(jaccard)
-            jaccard_train(ep) = jaccard_train(ep) + jaccard/epochSize;
+        [theta1, rho1] = cart2pol(Y(1), Y(2));
+        [theta2, rho2] = cart2pol(Yh(1), Yh(2));
+        theta1 = theta1*180/pi;
+        theta2 = theta2*180/pi;
+        theta_diff = theta2 - theta1;
+        if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
+                (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
+            predAcc_train(ep) = predAcc_train(ep) + 100/epochSize;
         end
         
         % Backpropagate
-        delta_y = sigmayg(Yp).*lossg(Yh, Y);
-        delta_4 = sigma4g(Z4tilde)*(Wy'*delta_y);
+        delta_y = sigmayg(Yp)*lossg(Yh, Y);
+        delta_6 = sigma6g(Z6tilde)*(Wy'*delta_y);
+        delta_5 = sigma5g(Z5tilde)*(W6'*delta_6);
+        delta_4 = sigma4g(Z4tilde)*(W5'*delta_5);
         delta_3 = sigma3g(Z3tilde)*(W4'*delta_4);
         delta_2 = sigma2g(Z2tilde)*(W3'*delta_3);
         delta_1 = sigma1g(Z1tilde)*(W2'*delta_2);
@@ -177,11 +203,15 @@ for ep = ep_start:Nep
         dW2 = dW2 + delta_2*Z1';
         dW3 = dW3 + delta_3*Z2';
         dW4 = dW4 + delta_4*Z3';
-        dWy = dWy + delta_y*Z4';
+        dW5 = dW5 + delta_5*Z4';
+        dW6 = dW6 + delta_6*Z5';
+        dWy = dWy + delta_y*Z6';
         dB1 = dB1 + delta_1;
         dB2 = dB2 + delta_2;
         dB3 = dB3 + delta_3;
         dB4 = dB4 + delta_4;
+        dB5 = dB5 + delta_5;
+        dB6 = dB6 + delta_6;
         dBy = dBy + delta_y;
     end
     
@@ -193,11 +223,15 @@ for ep = ep_start:Nep
     dW2 = dW2/epochSize;
     dW3 = dW3/epochSize;
     dW4 = dW4/epochSize;
+    dW5 = dW5/epochSize;
+    dW6 = dW6/epochSize;
     dWy = dWy/epochSize;
     dB1 = dB1/epochSize;
     dB2 = dB2/epochSize;
     dB3 = dB3/epochSize;
     dB4 = dB4/epochSize;
+    dB5 = dB5/epochSize;
+    dB6 = dB6/epochSize;
     dBy = dBy/epochSize;
     
     % Adam Optimizer
@@ -205,31 +239,43 @@ for ep = ep_start:Nep
     mW2 = (beta1*mW2 + (1 - beta1)*dW2);%/(1 - beta1^ep);
     mW3 = (beta1*mW3 + (1 - beta1)*dW3);%/(1 - beta1^ep);
     mW4 = (beta1*mW4 + (1 - beta1)*dW4);%/(1 - beta1^ep);
+    mW5 = (beta1*mW5 + (1 - beta1)*dW5);%/(1 - beta1^ep);
+    mW6 = (beta1*mW6 + (1 - beta1)*dW6);%/(1 - beta1^ep);
     mWy = (beta1*mWy + (1 - beta1)*dWy);%/(1 - beta1^ep);
     mB1 = (beta1*mB1 + (1 - beta1)*dB1);%/(1 - beta1^ep);
     mB2 = (beta1*mB2 + (1 - beta1)*dB2);%/(1 - beta1^ep);
     mB3 = (beta1*mB3 + (1 - beta1)*dB3);%/(1 - beta1^ep);
     mB4 = (beta1*mB4 + (1 - beta1)*dB4);%/(1 - beta1^ep);
+    mB5 = (beta1*mB5 + (1 - beta1)*dB5);%/(1 - beta1^ep);
+    mB6 = (beta1*mB6 + (1 - beta1)*dB6);%/(1 - beta1^ep);
     mBy = (beta1*mBy + (1 - beta1)*dBy);%/(1 - beta1^ep);
     vW1 = (beta2*vW1 + (1 - beta2)*dW1.*dW1);%/(1 - beta2^ep);
     vW2 = (beta2*vW2 + (1 - beta2)*dW2.*dW2);%/(1 - beta2^ep);
     vW3 = (beta2*vW3 + (1 - beta2)*dW3.*dW3);%/(1 - beta2^ep);
     vW4 = (beta2*vW4 + (1 - beta2)*dW4.*dW4);%/(1 - beta2^ep);
+    vW5 = (beta2*vW5 + (1 - beta2)*dW5.*dW5);%/(1 - beta2^ep);
+    vW6 = (beta2*vW6 + (1 - beta2)*dW6.*dW6);%/(1 - beta2^ep);
     vWy = (beta2*vWy + (1 - beta2)*dWy.*dWy);%/(1 - beta2^ep);
     vB1 = (beta2*vB1 + (1 - beta2)*dB1.*dB1);%/(1 - beta2^ep);
     vB2 = (beta2*vB2 + (1 - beta2)*dB2.*dB2);%/(1 - beta2^ep);
     vB3 = (beta2*vB3 + (1 - beta2)*dB3.*dB3);%/(1 - beta2^ep);
     vB4 = (beta2*vB4 + (1 - beta2)*dB4.*dB4);%/(1 - beta2^ep);
+    vB5 = (beta2*vB5 + (1 - beta2)*dB5.*dB5);%/(1 - beta2^ep);
+    vB6 = (beta2*vB6 + (1 - beta2)*dB6.*dB6);%/(1 - beta2^ep);
     vBy = (beta2*vBy + (1 - beta2)*dBy.*dBy);%/(1 - beta2^ep);
     dW1 = mW1./(sqrt(vW1) + epsilon);
     dW2 = mW2./(sqrt(vW2) + epsilon);
     dW3 = mW3./(sqrt(vW3) + epsilon);
     dW4 = mW4./(sqrt(vW4) + epsilon);
+    dW5 = mW5./(sqrt(vW5) + epsilon);
+    dW6 = mW6./(sqrt(vW6) + epsilon);
     dWy = mWy./(sqrt(vWy) + epsilon);
     dB1 = mB1./(sqrt(vB1) + epsilon);
     dB2 = mB2./(sqrt(vB2) + epsilon);
     dB3 = mB3./(sqrt(vB3) + epsilon);
     dB4 = mB4./(sqrt(vB4) + epsilon);
+    dB5 = mB5./(sqrt(vB5) + epsilon);
+    dB6 = mB6./(sqrt(vB6) + epsilon);
     dBy = mBy./(sqrt(vBy) + epsilon);
     
     % Update the weights
@@ -237,14 +283,18 @@ for ep = ep_start:Nep
     W2 = W2 - gamma*dW2;
     W3 = W3 - gamma*dW3;
     W4 = W4 - gamma*dW4;
+    W5 = W5 - gamma*dW5;
+    W6 = W6 - gamma*dW6;
     Wy = Wy - gamma*dWy;
     B1 = B1 - gamma*dB1;
     B2 = B2 - gamma*dB2;
     B3 = B3 - gamma*dB3;
     B4 = B4 - gamma*dB4;
+    B5 = B5 - gamma*dB5;
+    B6 = B6 - gamma*dB6;
     By = By - gamma*dBy;
     
-    % Compute the test loss, prediction accuracy and Jaccard index
+    % Compute the test loss and prediction accuracy
     im_test = randsample(idx_test, epochSize);
     for k = im_test
         X = T(k, :)';
@@ -256,16 +306,22 @@ for ep = ep_start:Nep
         Z3 = sigma3(Z3tilde);
         Z4tilde = (W4*Z3 + B4)*pkeep;
         Z4 = sigma4(Z4tilde);
-        Yp = Wy*Z4 + By;
+        Z5tilde = (W5*Z4 + B5);
+        Z5 = sigma5(Z5tilde);
+        Z6tilde = (W6*Z5 + B6);
+        Z6 = sigma6(Z6tilde);
+        Yp = Wy*Z6 + By;
         Yh = sigmay(Yp);
         Y = A(k, :)';
         C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
-        if sum(X) ~= 0
-            predAcc_test(ep) = predAcc_test(ep) + 100*(sum((Yh > threshold) == Y & X == 1)/sum(X))/epochSize;
-        end
-        jaccard = 1 - pdist([((Yh > threshold).*X)'; Y'], 'jaccard');
-        if ~isnan(jaccard)
-            jaccard_test(ep) = jaccard_test(ep) + jaccard/epochSize;
+        [theta1, rho1] = cart2pol(Y(1), Y(2));
+        [theta2, rho2] = cart2pol(Yh(1), Yh(2));
+        theta1 = theta1*180/pi;
+        theta2 = theta2*180/pi;
+        theta_diff = theta2 - theta1;
+        if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
+                (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
+            predAcc_test(ep) = predAcc_test(ep) + 100/epochSize;
         end
     end
     
@@ -274,16 +330,16 @@ for ep = ep_start:Nep
         predAccMax = predAcc_test(ep);
     end
     if save_flag == 1
-        save('../../mat/weights3.mat', ...
-            'n', 's1', 's2', 's3', 's4', 'm', ...
-            'W1', 'W2', 'W3', 'W4', 'Wy', ...
-            'B1', 'B2', 'B3', 'B4', 'By', ...
-            'mW1', 'mW2', 'mW3', 'mW4', 'mWy', ...
-            'mB1', 'mB2', 'mB3', 'mB4', 'mBy', ...
-            'vW1', 'vW2', 'vW3', 'vW4', 'vWy', ...
-            'vB1', 'vB2', 'vB3', 'vB4', 'vBy', ...
+        save('../../mat/weights1c.mat', ...
+            'n', 's1', 's2', 's3', 's4', 's5', 's6', 'm', ...
+            'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Wy', ...
+            'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'By', ...
+            'mW1', 'mW2', 'mW3', 'mW4', 'mW5', 'mW6', 'mWy', ...
+            'mB1', 'mB2', 'mB3', 'mB4', 'mB5', 'mB6', 'mBy', ...
+            'vW1', 'vW2', 'vW3', 'vW4', 'vW5', 'vW6', 'vWy', ...
+            'vB1', 'vB2', 'vB3', 'vB4', 'vB5', 'vB6', 'vBy', ...
             'predAccMax', 'idx_train', 'idx_test', 'pkeep', ...
-            'ep', 'C_train', 'C_test', 'predAcc_test', 'predAcc_train', 'jaccard_train', 'jaccard_test');
+            'ep', 'C_train', 'C_test', 'predAcc_test', 'predAcc_train');
     end
     
     % Compute the largest partial derivative
@@ -291,19 +347,23 @@ for ep = ep_start:Nep
         max(abs(min(min(dW2))), max(max(dW2))) + ...
         max(abs(min(min(dW3))), max(max(dW3))) + ...
         max(abs(min(min(dW4))), max(max(dW4))) + ...
+        max(abs(min(min(dW5))), max(max(dW5))) + ...
+        max(abs(min(min(dW6))), max(max(dW6))) + ...
         max(abs(min(min(dWy))), max(max(dWy))) + ...
         max(abs(min(min(dB1))), max(max(dB1))) + ...
         max(abs(min(min(dB2))), max(max(dB2))) + ...
         max(abs(min(min(dB3))), max(max(dB3))) + ...
         max(abs(min(min(dB4))), max(max(dB4))) + ...
+        max(abs(min(min(dB5))), max(max(dB5))) + ...
+        max(abs(min(min(dB6))), max(max(dB6))) + ...
         max(abs(min(min(dBy))), max(max(dBy)));
     
     % Display information
-    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.4f (%.4f) \n', ...
-        ep, C_train(ep), predAcc_test(ep), maxWeight, sum(full(Yh)), sum(full(Y)));
+    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t mean(W1) = %.2e \n', ...
+        ep, C_train(ep), predAcc_test(ep), maxWeight, mean(mean(abs(W1))));
     
     % Plot the error and prediction accuracy
-    subplot(1, 3, 1);
+    subplot(1, 2, 1);
     plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
     title('Loss');
     xlabel('Epoch number');
@@ -316,21 +376,14 @@ for ep = ep_start:Nep
     else
         ylabel('Loss');
     end
-    legend('training loss', 'test loss', 'Location', 'northwest');
+    legend('training loss', 'test loss');
     grid on;
-    subplot(1, 3, 2);
+    subplot(1, 2, 2);
     plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
     title('Prediction accuracy');
     xlabel('Epoch number');
     ylabel('Accuracy in %');
-    legend('training accuracy', 'test accuracy', 'Location', 'northwest');
-    grid on;
-    subplot(1, 3, 3);
-    plot(0:(ep-1), jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
-    title('Jaccard index');
-    xlabel('Epoch number');
-    ylabel('Jaccard value');
-    legend('training Jaccard index', 'test Jaccard index', 'Location', 'northwest');
+    legend('training accuracy', 'test accuracy', 'Location', 'southeast');
     grid on;
     
     % Display progress
@@ -343,7 +396,7 @@ close(h);
 
 % Plot the error and prediction accuracy
 figure;
-subplot(1, 3, 1);
+subplot(1, 2, 1);
 plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
 title('Loss');
 xlabel('Epoch number');
@@ -356,21 +409,14 @@ elseif strcmp(func2str(loss), 'quadraticLoss')
 else
     ylabel('Loss');
 end
-legend('training loss', 'test loss', 'Location', 'northwest');
+legend('training loss', 'test loss');
 grid on;
-subplot(1, 3, 2);
+subplot(1, 2, 2);
 plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
 title('Prediction accuracy');
 xlabel('Epoch number');
 ylabel('Accuracy in %');
-legend('training accuracy', 'test accuracy', 'Location', 'northwest');
-grid on;
-subplot(1, 3, 3);
-plot(0:(ep-1), jaccard_train(1:ep), '-b', 1:ep, jaccard_test(1:ep), '-r');
-title('Jaccard index');
-xlabel('Epoch number');
-ylabel('Jaccard value');
-legend('training Jaccard index', 'test Jaccard index', 'Location', 'northwest');
+legend('training accuracy', 'test accuracy');
 grid on;
 
 % Display the best prediction accuracy

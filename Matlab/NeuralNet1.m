@@ -19,15 +19,15 @@ load_flag = 0;
 save_flag = 1;
 
 % Learning rate
-gamma_min = 0.001;
-gamma_max = 0.001;
+gamma_min = 0.0001;
+gamma_max = 0.002;
 
 % Minimum momentum difference
 minDiff1 = 10;   % percent (of magnitude)
 minDiff2 = 5;    % absolute (of angle in degrees)
 
 % Dropout parameter
-pkeep = 0.8;
+pkeep = 1;
 
 % Epoch size
 epochSize = 1000;
@@ -35,10 +35,10 @@ Nep = Ntrain/epochSize; % Nr of epochs
 
 % Number of neurons
 n = NtubesSTT;   % Number of input neurons
-s1 = 300;        % 1:st hidden layer
+s1 = 400;        % 1:st hidden layer
 s2 = 200;        % 2:nd hidden layer
-s3 = 100;        % 3:rd hidden layer
-s4 = 40;         % 4:th hidden layer
+s3 = 80;         % 3:rd hidden layer
+s4 = 30;         % 4:th hidden layer
 m = 2;           % Number of output neurons
 
 % Activation functions
@@ -58,7 +58,7 @@ loss  = @quadraticLoss;
 lossg = @quadraticLoss_grad;
 
 % Standard deviation for the initial random weights
-st_dev = 0.07;
+st_dev = 0.085;
 
 % Transform data (not relevant here)
 T = Tstt;

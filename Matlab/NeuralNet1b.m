@@ -11,7 +11,7 @@ clear;
 load('../../mat/dataPatMom.mat');
 
 % Number of training and testing points (images)
-Ntrain = 1000000;
+Ntrain = 10000000;
 Ntest = 10000;
 
 % Load and save flags
@@ -27,7 +27,7 @@ minDiff1 = 10;   % percent (of magnitude)
 minDiff2 = 5;    % absolute (of angle in degrees)
 
 % Dropout parameter
-pkeep = 0.8;
+pkeep = 1;
 
 % Epoch size
 epochSize = 1000;
@@ -61,7 +61,7 @@ loss  = @quadraticLoss;
 lossg = @quadraticLoss_grad;
 
 % Standard deviation for the initial random weights
-st_dev = 0.07;
+st_dev = 0.1;
 
 % Transform data (not relevant here)
 T = Tstt;
@@ -147,7 +147,7 @@ for ep = ep_start:Nep
         doZ2 = 1*(rand(s2, 1) < pkeep);
         doZ3 = 1*(rand(s3, 1) < pkeep);
         doZ4 = 1*(rand(s4, 1) < pkeep);
-        doZ5 = 1*(rand(s5, 1) < pkeep);
+        %doZ5 = 1*(rand(s5, 1) < pkeep);
         
         % Forward propagation (with dropout)
         X = T(im, :)';
@@ -159,8 +159,8 @@ for ep = ep_start:Nep
         Z3 = sigma3(Z3tilde).*doZ3;
         Z4tilde = (W4*Z3 + B4).*doZ4;
         Z4 = sigma4(Z4tilde).*doZ4;
-        Z5tilde = (W5*Z4 + B5).*doZ5;
-        Z5 = sigma5(Z5tilde).*doZ5;
+        Z5tilde = (W5*Z4 + B5);
+        Z5 = sigma5(Z5tilde);
         Yp = Wy*Z5 + By;
         Yh = sigmay(Yp);
         
@@ -281,7 +281,7 @@ for ep = ep_start:Nep
         Z3 = sigma3(Z3tilde);
         Z4tilde = (W4*Z3 + B4)*pkeep;
         Z4 = sigma4(Z4tilde);
-        Z5tilde = (W5*Z4 + B5)*pkeep;
+        Z5tilde = (W5*Z4 + B5);
         Z5 = sigma5(Z5tilde);
         Yp = Wy*Z5 + By;
         Yh = sigmay(Yp);
