@@ -14,8 +14,7 @@ load('../../mat/dataPat.mat');
 % Choose subset (train or test data)
 idx = idx_test;
 
-% Dropout parameter
-pkeep = 1;
+pkeep = 0.8;
 
 % Activation functions
 sigma1  = @relu;
@@ -34,11 +33,16 @@ T = Tstt;
 
 %
 % Loop over threshold values
-thresholds = 0.98:0.001:1;
+thresholds = 0.98:0.002 :1;
 pred_acc = zeros(length(thresholds), 1);
+efficiency = zeros(length(thresholds), 1);
+purity = zeros(length(thresholds), 1);
 for i = 1:length(thresholds)
     disp(['i = ' num2str(i) '/' num2str(length(thresholds))]);
     th = thresholds(i);
+    Nx_miss = 0;
+    Ny_miss = 0;
+    Nyh_miss = 0;
     for k = idx
         X = T(k, :)';
         Z1tilde = (W1*X + B1)*pkeep;
@@ -52,16 +56,33 @@ for i = 1:length(thresholds)
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
         Yh_th = zeros(size(Yh));
-        Yh_th(Yh > th) = 1;
+        Yh_th(Yh > th & X == 1) = 1;
         Y = A(k, :)';
         if sum(X(1:NtubesSTT)) ~= 0
-            pred_acc(i) = pred_acc(i) + 100*(sum(Yh_th == Y & X(1:NtubesSTT) == 1)/sum(X(1:NtubesSTT)))/length(idx);
+            pred_acc(i) = pred_acc(i) + 100*(sum(Yh_th == Y & X(1:NtubesSTT) == 1)/sum(X(1:NtubesSTT)));
+        else
+            Nx_miss = Nx_miss + 1;
+        end
+        if sum(Y) ~= 0
+            efficiency(i) = efficiency(i) + 100*(sum(Yh_th == Y & Y == 1)/sum(Y));
+        else
+            Ny_miss = Ny_miss + 1;
+        end
+        if sum(Yh_th) ~= 0
+            purity(i) = purity(i) + 100*(sum(Yh_th == Y & Y == 1)/sum(Yh_th));
+        else
+            Nyh_miss = Nyh_miss + 1;
         end
     end
+    
+    pred_acc(i) = pred_acc(i)/(length(idx) - Nx_miss);
+    efficiency(i) = efficiency(i)/(length(idx) - Ny_miss);
+    purity(i) = purity(i)/(length(idx) - Nyh_miss);
 end
 
 % Plot
-plot(thresholds, pred_acc);
+plot(thresholds, pred_acc, '-b', thresholds, efficiency, '-r', thresholds, purity, '-g');
+legend('accuracy', 'efficiency', 'purity');
 %}
 
 

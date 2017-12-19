@@ -9,6 +9,7 @@ The ‘macros’ folder contains the macros (C-files) for running the C++ files.
 The ‘Matlab’ folder contains all the m-files which first rewrites the data into matrices (CreateData*-files) and then trains the neural networks (NeuralNetwork*-files). This folder also contains separate files for the activation and loss functions and their derivatives.
 
 -----------------------------------------------TEST RUNS---------------------------------------------
+
 We have provided some smaller example data set. To run the Pattern recognition network, you need to go into the Matlab folder and change the load command in NeuralNet3 which is located in the beginning of the script from
 load('../../mat/dataPat.mat');
 To

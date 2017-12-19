@@ -18,11 +18,11 @@ load_flag = 0;
 save_flag = 1;
 
 % Learning rate
-gamma_min = 0.001;
+gamma_min = 0.0001;
 gamma_max = 0.001;
 
 % Dropout parameter
-pkeep = 1;
+pkeep = 0.8;
 
 % Threshold for classifying hits
 threshold = 0.99;

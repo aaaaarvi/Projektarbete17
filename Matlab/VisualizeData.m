@@ -52,6 +52,7 @@ end
 %k = 1144;
 %k = 7035;
 %k = 4749;
+%k = 5722;
 
 % Feed forward
 X = T(k, :)';
@@ -73,6 +74,8 @@ Yh_th(Yh > threshold & X == 1) = 1;
 
 % Compute prediction accuracy
 pred_acc = 100*(sum(Yh_th == Y & X == 1)/sum(X));
+efficiency = 100*(sum(Yh_th == Y & Y == 1)/sum(Y));
+purity = 100*(sum(Yh_th == Y & Y == 1)/sum(Yh_th));
 
 % Plot the input data
 figure('pos', [10, 500, 1200, 480]);
@@ -205,6 +208,8 @@ scale = 50;
 quiver(0, 0, scale*Y(1), scale*Y(2), ':b', 'LineWidth', 2, 'MaxHeadSize', 1);
 quiver(0, 0, scale*Yh(1), scale*Yh(2), '-b', 'LineWidth', 2, 'MaxHeadSize', 1);
 legend(['acc = ' num2str(pred_acc) ' %'], ...
+    ['eff = ' num2str(efficiency) ' %'], ...
+    ['pur = ' num2str(purity) ' %'], ...
     ['\delta\rho = ' num2str(rho_error) ' %'], ...
     ['\delta\theta = ' num2str(theta_error) '\circ']);
 
