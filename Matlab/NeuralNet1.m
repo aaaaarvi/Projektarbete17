@@ -20,7 +20,7 @@ save_flag = 1;
 
 % Learning rate
 gamma_min = 0.0001;
-gamma_max = 0.002;
+gamma_max = 0.001;
 
 % Minimum momentum difference
 minDiff1 = 10;   % percent (of magnitude)
