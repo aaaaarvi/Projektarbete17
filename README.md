@@ -11,12 +11,19 @@ The ‘Matlab’ folder contains all the m-files which first rewrites the data i
 -----------------------------------------------TEST RUNS---------------------------------------------
 
 We have provided some smaller example data set. To run the Pattern recognition network, you need to go into the Matlab folder and change the load command in NeuralNet3 which is located in the beginning of the script from
+
 load('../../mat/dataPat.mat');
-To
+
+to
+
 load('./dataPat.mat');
+
 This will train a network for extracting the final state proton. In order to train the network for momentum regression, go into the Matlab folder again and change the load command in NeuralNet1 from 
+
 load('../../mat/dataPatMom.mat');
-To
+
+to
+
 load('./dataPatMom.mat');
 
 
