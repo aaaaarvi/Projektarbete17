@@ -5,7 +5,7 @@
 clear;
 
 % Number of networks
-Nnets = 5;
+Nnets = 10;
 
 % Minimum momentum difference
 minDiff1 = 10;   % percent (of magnitude)
@@ -72,7 +72,7 @@ end
 
 % Compute the average and the combined accuracy
 acc = zeros(Nnets, 1);
-acc_combined = 0;
+acc_combined = zeros(Nnets, 1);
 for i = idx
     Yh_combined = zeros(m, 1);
     for j = 1:Nnets
@@ -106,30 +106,41 @@ for i = idx
                 (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
             acc(j) = acc(j) + 100/Ntest;
         end
-    end
-    
-    % Compute combined accuracy
-    Yh = Yh_combined/Nnets;
-    [theta1, rho1] = cart2pol(Y(1), Y(2));
-    [theta2, rho2] = cart2pol(Yh(1), Yh(2));
-    theta1 = theta1*180/pi;
-    theta2 = theta2*180/pi;
-    theta_diff = theta2 - theta1;
-    if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
-            (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
-        acc_combined = acc_combined + 100/Ntest;
+        
+        % Compute combined accuracy
+        Yhc = Yh_combined/j;
+        [theta1, rho1] = cart2pol(Y(1), Y(2));
+        [theta2, rho2] = cart2pol(Yhc(1), Yhc(2));
+        theta1 = theta1*180/pi;
+        theta2 = theta2*180/pi;
+        theta_diff = theta2 - theta1;
+        if (100*abs(rho2 - rho1)/rho1 < minDiff1) && ...
+                (min([abs(theta_diff), abs(theta_diff + 360), abs(theta_diff - 360)]) < minDiff2)
+            acc_combined(j) = acc_combined(j) + 100/Ntest;
+        end
     end
     
     % Display progress
-    if mod(i, 100) == 0
-        disp(['i = ' num2str(i) '/' num2str(idx(end))]);
+    if mod(i, 500) == 0
+        disp(['Progress: ' num2str(round(100*i/idx(end))) ' %']);
     end
 end
 
 % Display results
 disp(['Average accuracy:      ' num2str(sum(acc)/Nnets) ' %']);
 disp(['Highest ind. accuracy: ' num2str(max(acc)) ' %']);
-disp(['Combined accuracy:     ' num2str(acc_combined) ' %']);
+disp(['Combined accuracy:     ' num2str(acc_combined(Nnets)) ' %']);
+
+% Plot accuracy vs number of nets
+figure;
+plot(1:Nnets, acc_combined, '-b');
+xlabel('Number of networks');
+ylabel('Prediction accuracy');
+grid on;
+
+
+
+
 
 
 

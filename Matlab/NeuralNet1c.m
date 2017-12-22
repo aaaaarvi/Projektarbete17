@@ -73,7 +73,8 @@ T = Tstt;
 Ntest = min(Npoints/2, Ntest);
 idx_keep = find(sum(T, 2) ~= 0)';
 Npoints = length(idx_keep);
-idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
+%idx_test = idx_keep(1:Ntest);%randsample(idx_keep, Ntest);
+idx_test = randsample(idx_keep, Ntest);
 idx_train = setdiff(idx_keep, idx_test);
 
 % Initial weights and biases
