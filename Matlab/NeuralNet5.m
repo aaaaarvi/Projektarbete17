@@ -9,7 +9,7 @@ clear;
 % Load data
 load('../../mat/dataClass.mat');
 
-% Number of training and testing points (images)
+% Number of training and testing points
 Ntrain = 10000000;
 Ntest = 10000;
 
@@ -27,9 +27,9 @@ pkeep = 0.7;
 % Standard deviation for the initial random weights
 st_dev = 0.12;
 
-% Epoch size
-epochSize = 1000;
-Nep = Ntrain/epochSize; % Nr of epochs
+% Batch size
+batchSize = 1000;
+Nb = Ntrain/batchSize; % Nr of batches
 
 % Number of neurons
 n = NtubesSTT;   % Number of input neurons
@@ -103,10 +103,10 @@ mBy = zeros(m, 1);    vBy = zeros(m, 1);
 %% TRAINING
 
 % Train the network
-C_train = zeros(Nep, 1);
-C_test = zeros(Nep, 1);
-predAcc_test = zeros(Nep, 1);
-predAcc_train = zeros(Nep, 1);
+C_train = zeros(Nb, 1);
+C_test = zeros(Nb, 1);
+predAcc_test = zeros(Nb, 1);
+predAcc_train = zeros(Nb, 1);
 predAccMax = 0;
 ep_start = 1;
 if load_flag == 1
@@ -114,10 +114,10 @@ if load_flag == 1
     ep_start = ep + 1;
 end
 
-% Loop through each epoch
+% Loop through each batch
 figure;
 h = waitbar(0, 'Training the neurual network...');
-for ep = ep_start:Nep
+for ep = ep_start:Nb
     
     % Initialize the weight and bias changes
     dW1 = zeros(s1, n);
@@ -131,9 +131,9 @@ for ep = ep_start:Nep
     dB4 = zeros(s4, 1);
     dBy = zeros(m, 1);
     
-    % Loop through each image in the epoch
+    % Loop through each data point in the batch
     confusion_train = zeros(3, 3);
-    im_train = randsample(idx_train, epochSize);
+    im_train = randsample(idx_train, batchSize);
     for im = im_train
         
         % Dropout vectors
@@ -157,12 +157,12 @@ for ep = ep_start:Nep
         
         % Compute the training loss
         Y = A(im, :)';
-        C_train(ep) = C_train(ep) + loss(Yh, Y)/epochSize;
+        C_train(ep) = C_train(ep) + loss(Yh, Y)/batchSize;
         
         % Compute the training prediction accuracy
         [~, pred] = max(Yh);
         [~, correct] = max(Y);
-        predAcc_train(ep) = predAcc_train(ep) + 100*(pred == correct)/epochSize;
+        predAcc_train(ep) = predAcc_train(ep) + 100*(pred == correct)/batchSize;
         
         % Update training confusion matrix
         confusion_train(pred, correct) = confusion_train(pred, correct) + 1;
@@ -186,19 +186,19 @@ for ep = ep_start:Nep
     end
     
     % Step size
-    gamma = gamma_max*((gamma_min/gamma_max)^(ep/Nep));
+    gamma = gamma_max*((gamma_min/gamma_max)^(ep/Nb));
     
     % Partial derivatives
-    dW1 = dW1/epochSize;
-    dW2 = dW2/epochSize;
-    dW3 = dW3/epochSize;
-    dW4 = dW4/epochSize;
-    dWy = dWy/epochSize;
-    dB1 = dB1/epochSize;
-    dB2 = dB2/epochSize;
-    dB3 = dB3/epochSize;
-    dB4 = dB4/epochSize;
-    dBy = dBy/epochSize;
+    dW1 = dW1/batchSize;
+    dW2 = dW2/batchSize;
+    dW3 = dW3/batchSize;
+    dW4 = dW4/batchSize;
+    dWy = dWy/batchSize;
+    dB1 = dB1/batchSize;
+    dB2 = dB2/batchSize;
+    dB3 = dB3/batchSize;
+    dB4 = dB4/batchSize;
+    dBy = dBy/batchSize;
     
     % Adam Optimizer
     mW1 = (beta1*mW1 + (1 - beta1)*dW1);%/(1 - beta1^ep);
@@ -246,7 +246,7 @@ for ep = ep_start:Nep
     
     % Compute the test loss, prediction accuracy and confusion matrix
     confusion_test = zeros(3, 3);
-    im_test = randsample(idx_test, epochSize);
+    im_test = randsample(idx_test, batchSize);
     for k = im_test
         X = T(k, :)';
         Z1tilde = (W1*X + B1)*pkeep;
@@ -260,10 +260,10 @@ for ep = ep_start:Nep
         Yp = Wy*Z4 + By;
         Yh = sigmay(Yp);
         Y = A(k, :)';
-        C_test(ep) = C_test(ep) + loss(Yh, Y)/epochSize;
+        C_test(ep) = C_test(ep) + loss(Yh, Y)/batchSize;
         [~, pred] = max(Yh);
         [~, correct] = max(Y);
-        predAcc_test(ep) = predAcc_test(ep) + 100*(pred == correct)/epochSize;
+        predAcc_test(ep) = predAcc_test(ep) + 100*(pred == correct)/batchSize;
         confusion_test(pred, correct) = confusion_test(pred, correct) + 1;
     end
     
@@ -298,14 +298,14 @@ for ep = ep_start:Nep
         max(abs(min(min(dBy))), max(max(dBy)));
     
     % Display information
-    fprintf('Epoch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.4f (%.4f) \n', ...
+    fprintf('Batch %d: C = %.3f \t acc = %.2f %%\t max(dW) = %.2e \t sum(Yh) = %.4f (%.4f) \n', ...
         ep, C_train(ep), predAcc_test(ep), maxWeight, sum(full(Yh)), sum(full(Y)));
     
     % Plot the error and prediction accuracy
     subplot(1, 2, 1);
     plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
     title('Loss');
-    xlabel('Epoch number');
+    xlabel('Batch number');
     if strcmp(func2str(loss), 'crossEntropyLoss')
         ylabel('Cross-entropy loss');
     elseif strcmp(func2str(loss), 'crossEntropyLoss2')
@@ -320,13 +320,13 @@ for ep = ep_start:Nep
     subplot(1, 2, 2);
     plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
     title('Prediction accuracy');
-    xlabel('Epoch number');
+    xlabel('Batch number');
     ylabel('Accuracy in %');
     legend('training accuracy', 'test accuracy', 'Location', 'northwest');
     grid on;
     
     % Display progress
-    waitbar(ep/Nep, h);
+    waitbar(ep/Nb, h);
 end
 close(h);
 
@@ -338,7 +338,7 @@ figure;
 subplot(1, 2, 1);
 plot(0:(ep-1), C_train(1:ep), '-b', 1:ep, C_test(1:ep), '-r');
 title('Loss');
-xlabel('Epoch number');
+xlabel('Batch number');
 if strcmp(func2str(loss), 'crossEntropyLoss')
     ylabel('Cross-entropy loss');
 elseif strcmp(func2str(loss), 'crossEntropyLoss2')
@@ -353,7 +353,7 @@ grid on;
 subplot(1, 2, 2);
 plot(0:(ep-1), predAcc_train(1:ep), '-b', 1:ep, predAcc_test(1:ep), '-r');
 title('Prediction accuracy');
-xlabel('Epoch number');
+xlabel('Batch number');
 ylabel('Accuracy in %');
 legend('training accuracy', 'test accuracy', 'Location', 'northwest');
 grid on;

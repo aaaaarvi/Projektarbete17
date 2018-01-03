@@ -8,19 +8,19 @@ clear;
 Nnets = 1;
 
 % Load test indices
-load('../../mat/NN3/weights3_run2.mat', 'idx_test');
+load('../../mat/NN3/weights3_run1.mat', 'idx_test');
 idx = idx_test;
 Ntest = length(idx);
 
 % Load weight sizes and pkeep
-load('../../mat/NN3/weights3_run2.mat', 'pkeep', ...
+load('../../mat/NN3/weights3_run1.mat', 'pkeep', ...
     'n', 's1', 's2', 's3', 's4', 'm');
 
 % Load event data
 load('../../mat/dataPat.mat');
 T = Tstt;
 
-%Threshold value
+% Threshold value
 threshold = 0.99;
 
 % Activation functions
@@ -28,7 +28,7 @@ sigma1  = @relu;
 sigma2  = @relu;
 sigma3  = @relu;
 sigma4  = @relu;
-sigmay  = @lin;
+sigmay  = @sigmoid;
 
 % Initialize weight and bias tensors
 W1_all = zeros(s1, n, Nnets);
@@ -62,7 +62,6 @@ end
 % Compute the average and the combined accuracy
 acc = zeros(Nnets, 1);
 acc_combined = zeros(Nnets, 1);
-Yh_th = zeros(m, 1);
 for i = idx
     Yh_combined = zeros(m, 1);
     for j = 1:Nnets
@@ -79,6 +78,7 @@ for i = idx
         Z4 = sigma4(Z4tilde);
         Yp = Wy_all(:,:,j)*Z4 + By_all(:,j);
         Yh = sigmay(Yp);
+        Yh_th = zeros(size(Yh));
         Yh_th(Yh > threshold & X == 1) = 1;
         Y = A(i, :)';
         Yh_combined = Yh_combined + Yh;

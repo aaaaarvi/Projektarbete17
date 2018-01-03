@@ -148,9 +148,9 @@ ylim([-43, 43]);
 %% Plot momentum vector
 
 % Load weights
-load('../../mat/weights1.mat', 'pkeep', ...
-    'W1', 'W2', 'W3', 'W4', 'Wy', ...
-    'B1', 'B2', 'B3', 'B4', 'By');
+load('../../mat/weights1c.mat', 'pkeep', ...
+    'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'Wy', ...
+    'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'By');
 
 % Load event data
 clear T Tstt A;
@@ -161,6 +161,8 @@ sigma1  = @relu;
 sigma2  = @relu;
 sigma3  = @relu;
 sigma4  = @relu;
+sigma5  = @relu;
+sigma6  = @relu;
 sigmay  = @lin;
 
 % Transform data (not currently relevant)
@@ -177,7 +179,11 @@ Z3tilde = (W3*Z2 + B3)*pkeep;
 Z3 = sigma3(Z3tilde);
 Z4tilde = (W4*Z3 + B4)*pkeep;
 Z4 = sigma4(Z4tilde);
-Yp = Wy*Z4 + By;
+Z5tilde = (W5*Z4 + B5);
+Z5 = sigma5(Z5tilde);
+Z6tilde = (W6*Z5 + B6);
+Z6 = sigma6(Z6tilde);
+Yp = Wy*Z6 + By;
 Yh = sigmay(Yp);
 Y = A(k, :)';
 

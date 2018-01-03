@@ -14,8 +14,6 @@ load('../../mat/dataPat.mat');
 % Choose subset (train or test data)
 idx = idx_test;
 
-pkeep = 0.8;
-
 % Activation functions
 sigma1  = @relu;
 sigma1g = @relu_grad;
@@ -33,31 +31,34 @@ T = Tstt;
 
 %
 % Loop over threshold values
-thresholds = 0.98:0.002 :1;
+thresholds = 0.99;
 pred_acc = zeros(length(thresholds), 1);
 efficiency = zeros(length(thresholds), 1);
 purity = zeros(length(thresholds), 1);
-for i = 1:length(thresholds)
-    disp(['i = ' num2str(i) '/' num2str(length(thresholds))]);
-    th = thresholds(i);
-    Nx_miss = 0;
-    Ny_miss = 0;
-    Nyh_miss = 0;
-    for k = idx
-        X = T(k, :)';
-        Z1tilde = (W1*X + B1)*pkeep;
-        Z1 = sigma1(Z1tilde);
-        Z2tilde = (W2*Z1 + B2)*pkeep;
-        Z2 = sigma2(Z2tilde);
-        Z3tilde = (W3*Z2 + B3)*pkeep;
-        Z3 = sigma3(Z3tilde);
-        Z4tilde = (W4*Z3 + B4)*pkeep;
-        Z4 = sigma4(Z4tilde);
-        Yp = Wy*Z4 + By;
-        Yh = sigmay(Yp);
+Nx_miss = 0;
+Ny_miss = 0;
+Nyh_miss = zeros(length(thresholds), 1);
+for k = idx
+    if mod(k, 100) == 0
+        disp(['k = ' num2str(k) '/' num2str(idx(end))]);
+    end
+    X = T(k, :)';
+    Z1tilde = (W1*X + B1)*pkeep;
+    Z1 = sigma1(Z1tilde);
+    Z2tilde = (W2*Z1 + B2)*pkeep;
+    Z2 = sigma2(Z2tilde);
+    Z3tilde = (W3*Z2 + B3)*pkeep;
+    Z3 = sigma3(Z3tilde);
+    Z4tilde = (W4*Z3 + B4)*pkeep;
+    Z4 = sigma4(Z4tilde);
+    Yp = Wy*Z4 + By;
+    Yh = sigmay(Yp);
+    Y = A(k, :)';
+    
+    for i = 1:length(thresholds)
+        th = thresholds(i);
         Yh_th = zeros(size(Yh));
         Yh_th(Yh > th & X == 1) = 1;
-        Y = A(k, :)';
         if sum(X(1:NtubesSTT)) ~= 0
             pred_acc(i) = pred_acc(i) + 100*(sum(Yh_th == Y & X(1:NtubesSTT) == 1)/sum(X(1:NtubesSTT)));
         else
@@ -71,17 +72,22 @@ for i = 1:length(thresholds)
         if sum(Yh_th) ~= 0
             purity(i) = purity(i) + 100*(sum(Yh_th == Y & Y == 1)/sum(Yh_th));
         else
-            Nyh_miss = Nyh_miss + 1;
+            Nyh_miss(i) = Nyh_miss(i) + 1;
         end
     end
-    
-    pred_acc(i) = pred_acc(i)/(length(idx) - Nx_miss);
-    efficiency(i) = efficiency(i)/(length(idx) - Ny_miss);
-    purity(i) = purity(i)/(length(idx) - Nyh_miss);
 end
+
+% Adjust for data points that are missing X, Y or Yh vector
+Nx_miss = Nx_miss/length(thresholds);
+Ny_miss = Ny_miss/length(thresholds);
+pred_acc = pred_acc/(length(idx) - Nx_miss);
+efficiency = efficiency/(length(idx) - Ny_miss);
+purity = purity./(length(idx) - Nyh_miss);
 
 % Plot
 plot(thresholds, pred_acc, '-b', thresholds, efficiency, '-r', thresholds, purity, '-g');
+xlabel('Threshold');
+ylabel('Performance value');
 legend('accuracy', 'efficiency', 'purity');
 %}
 
