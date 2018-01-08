@@ -10,7 +10,7 @@ clear;
 load('../../mat/dataPatMom.mat');
 
 % Number of training and testing points
-Ntrain = 10000000;
+Ntrain = 3000000;
 Ntest = 10000;
 
 % Load and save flags

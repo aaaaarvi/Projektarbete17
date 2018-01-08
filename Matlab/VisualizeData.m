@@ -54,6 +54,15 @@ end
 %k = 4749;
 %k = 5722;
 
+%k = 5433;
+%k = 1792;
+%k = 4451;
+%k = 8899;
+%k = 9877;
+%k = 5129;
+%k = 7812;
+%k = 6171;
+
 % Feed forward
 X = T(k, :)';
 Z1tilde = (W1*X + B1)*pkeep;
@@ -213,11 +222,11 @@ plot([-x, 0], [y1, y2], '-k', 'LineWidth', 2);
 scale = 50;
 quiver(0, 0, scale*Y(1), scale*Y(2), ':b', 'LineWidth', 2, 'MaxHeadSize', 1);
 quiver(0, 0, scale*Yh(1), scale*Yh(2), '-b', 'LineWidth', 2, 'MaxHeadSize', 1);
-legend(['acc = ' num2str(pred_acc) ' %'], ...
-    ['eff = ' num2str(efficiency) ' %'], ...
-    ['pur = ' num2str(purity) ' %'], ...
-    ['\delta\rho = ' num2str(rho_error) ' %'], ...
-    ['\delta\theta = ' num2str(theta_error) '\circ']);
+%legend(['acc = ' num2str(pred_acc) ' %'], ...
+%    ['eff = ' num2str(efficiency) ' %'], ...
+%    ['pur = ' num2str(purity) ' %'], ...
+%    ['\delta\rho = ' num2str(rho_error) ' %'], ...
+%    ['\delta\theta = ' num2str(theta_error) '\circ']);
 
 
 
