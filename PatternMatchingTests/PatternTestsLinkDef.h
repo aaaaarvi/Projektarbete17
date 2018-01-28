@@ -18,5 +18,6 @@
 #pragma link C++ class TSPatDataGenerator+;
 #pragma link C++ class ClassDataGenerator+;
 #pragma link C++ class TestTubeGenerator+;
+#pragma link C++ class PatPiDataGenerator+;
 #endif
 

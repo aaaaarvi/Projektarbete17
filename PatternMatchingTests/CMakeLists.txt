@@ -47,7 +47,7 @@ PatDataGenerator.cxx
 TSPatDataGenerator.cxx
 ClassDataGenerator.cxx
 TestTubeGenerator.cxx
-
+PatPiDataGenerator.cxx
 )
 
 set(LINKDEF  PatternTestsLinkDef.h)
